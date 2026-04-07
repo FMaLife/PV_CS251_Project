@@ -1,5 +1,5 @@
 from django.db import models, transaction
-
+from django.db.models import F
 
 class Supplier(models.Model):
     supplier_id = models.AutoField(primary_key=True)
@@ -83,18 +83,30 @@ class RestockOrder(models.Model):
     def __str__(self):
         return f"Restock #{self.restock_id}"
 
-    def mark_received(self):
-        if self.restock_status == self.RestockStatusChoices.RECEIVED:
-            return
+    def save(self, *args, **kwargs):
+        from catalog.models import Product
 
         with transaction.atomic():
-            for detail in self.details.select_related("product").all():
-                detail.product.stock_quantity += detail.quantity
-                detail.product.save()
+            old_status = None
 
-            self.restock_status = self.RestockStatusChoices.RECEIVED
-            self.save()
+            if self.pk:
+                old_status = (
+                    RestockOrder.objects
+                    .select_for_update()
+                    .filter(pk=self.pk)
+                    .values_list("restock_status", flat=True)
+                    .first()
+                )
 
+            super().save(*args, **kwargs)
+
+            if old_status != self.RestockStatusChoices.RECEIVED and self.restock_status == self.RestockStatusChoices.RECEIVED:
+                details = self.details.select_related("product").all()
+
+                for detail in details:
+                    Product.objects.filter(pk=detail.product_id).update(
+                        stock_quantity=F("stock_quantity") + detail.quantity
+                    )
 
 class RestockDetail(models.Model):
     restock_detail_id = models.AutoField(primary_key=True)
