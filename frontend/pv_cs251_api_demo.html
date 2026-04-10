@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PV CS251 API Demo</title>
+    <style>
+        :root {
+            --bg: #0f172a;
+            --panel: #111827;
+            --panel-2: #1f2937;
+            --line: #334155;
+            --text: #e5e7eb;
+            --muted: #94a3b8;
+            --accent: #38bdf8;
+            --accent-2: #22c55e;
+            --warn: #f59e0b;
+            --danger: #ef4444;
+            --shadow: 0 10px 30px rgba(0, 0, 0, .25);
+            --radius: 18px;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+            background: linear-gradient(180deg, #020617 0%, #0f172a 100%);
+            color: var(--text);
+        }
+
+        .container {
+            max-width: 1500px;
+            margin: 0 auto;
+            padding: 24px;
+        }
+
+        .hero {
+            background: rgba(17, 24, 39, 0.92);
+            border: 1px solid var(--line);
+            border-radius: 24px;
+            padding: 24px;
+            box-shadow: var(--shadow);
+            margin-bottom: 22px;
+        }
+
+        .hero h1 {
+            margin: 0 0 10px;
+            font-size: 30px;
+        }
+
+        .hero p {
+            margin: 6px 0;
+            color: var(--muted);
+            line-height: 1.55;
+        }
+
+        .toolbar {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            gap: 12px;
+            margin-top: 18px;
+        }
+
+        input,
+        select,
+        textarea,
+        button {
+            width: 100%;
+            border-radius: 12px;
+            border: 1px solid var(--line);
+            background: #0b1220;
+            color: var(--text);
+            padding: 12px 14px;
+            font-size: 14px;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 120px;
+            font-family: Consolas, Monaco, monospace;
+            line-height: 1.45;
+        }
+
+        button {
+            cursor: pointer;
+            background: #162235;
+            transition: .18s ease;
+            font-weight: 600;
+        }
+
+        button:hover {
+            transform: translateY(-1px);
+            border-color: #60a5fa;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1.25fr .75fr;
+            gap: 18px;
+            align-items: start;
+        }
+
+        .panel {
+            background: rgba(17, 24, 39, 0.92);
+            border: 1px solid var(--line);
+            border-radius: 24px;
+            padding: 18px;
+            box-shadow: var(--shadow);
+        }
+
+        .group {
+            margin-bottom: 22px;
+        }
+
+        .group-title {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 0 0 12px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid rgba(148, 163, 184, .2);
+        }
+
+        .group-title h2 {
+            margin: 0;
+            font-size: 22px;
+        }
+
+        .cards {
+            display: grid;
+            gap: 14px;
+        }
+
+        .card {
+            background: linear-gradient(180deg, rgba(31, 41, 55, .95), rgba(15, 23, 42, .95));
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            padding: 16px;
+        }
+
+        .card-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .card h3 {
+            margin: 0 0 4px;
+            font-size: 18px;
+        }
+
+        .card p {
+            margin: 0;
+            color: var(--muted);
+            line-height: 1.45;
+            font-size: 14px;
+        }
+
+        .badges {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin: 10px 0;
+        }
+
+        .badge {
+            padding: 6px 10px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 700;
+            border: 1px solid rgba(255, 255, 255, .1);
+        }
+
+        .get {
+            background: rgba(56, 189, 248, .14);
+            color: #7dd3fc;
+        }
+
+        .post {
+            background: rgba(34, 197, 94, .15);
+            color: #86efac;
+        }
+
+        .put {
+            background: rgba(245, 158, 11, .15);
+            color: #fcd34d;
+        }
+
+        .patch {
+            background: rgba(168, 85, 247, .15);
+            color: #d8b4fe;
+        }
+
+        .delete {
+            background: rgba(239, 68, 68, .15);
+            color: #fca5a5;
+        }
+
+        .readonly {
+            background: rgba(148, 163, 184, .16);
+            color: #cbd5e1;
+        }
+
+        .writeable {
+            background: rgba(34, 197, 94, .14);
+            color: #86efac;
+        }
+
+        .path {
+            margin: 10px 0;
+            padding: 10px 12px;
+            border-radius: 12px;
+            background: rgba(2, 6, 23, .7);
+            border: 1px dashed rgba(148, 163, 184, .35);
+            font-family: Consolas, Monaco, monospace;
+            font-size: 13px;
+            overflow-wrap: anywhere;
+        }
+
+        .controls {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .controls-3 {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .muted {
+            color: var(--muted);
+            font-size: 13px;
+        }
+
+        .example-title {
+            margin: 10px 0 6px;
+            font-size: 13px;
+            color: #cbd5e1;
+            font-weight: 700;
+        }
+
+        .sticky {
+            position: sticky;
+            top: 20px;
+        }
+
+        .status-row {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 10px;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .status {
+            padding: 10px 12px;
+            border-radius: 12px;
+            background: rgba(2, 6, 23, .8);
+            border: 1px solid rgba(148, 163, 184, .2);
+            font-size: 14px;
+        }
+
+        pre {
+            margin: 0;
+            white-space: pre-wrap;
+            word-break: break-word;
+            background: #020617;
+            padding: 14px;
+            border-radius: 16px;
+            border: 1px solid rgba(148, 163, 184, .2);
+            min-height: 320px;
+            overflow: auto;
+            font-size: 13px;
+            line-height: 1.5;
+            font-family: Consolas, Monaco, monospace;
+        }
+
+        .small-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .small-buttons button {
+            width: auto;
+            padding: 8px 10px;
+            font-size: 13px;
+        }
+
+        .footer-note {
+            margin-top: 10px;
+            font-size: 12px;
+            color: var(--muted);
+            line-height: 1.45;
+        }
+
+        @media (max-width: 1100px) {
+
+            .grid,
+            .toolbar,
+            .controls,
+            .controls-3 {
+                grid-template-columns: 1fr;
+            }
+
+            .sticky {
+                position: static;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <section class="hero">
+            <h1>PV CS251 API Demo</h1>
+            <p>หน้าเดโมคร่าว ๆ สำหรับโชว์ endpoint ที่มีอยู่ตอนนี้ และลองยิง API จากฝั่งฟร้อนได้เลย</p>
+            <p>ค่าเริ่มต้นตั้งเป็น backend local ที่ <strong>http://127.0.0.1:8000</strong> และ endpoint ของ DRF router
+                ใช้ <strong>trailing slash</strong> เช่น <code>/api/catalog/products/</code></p>
+            <p>ถ้าเปิดไฟล์นี้ตรง ๆ ผ่าน <code>file://</code> แล้วโดน CORS ให้เอาไฟล์นี้ไป serve ผ่าน frontend dev server
+                ที่พอร์ต 3000 หรือวางเป็น template ฝั่ง Django แทน</p>
+
+            <div class="toolbar">
+                <input id="baseUrl" value="http://127.0.0.1:8000" placeholder="Base URL เช่น http://127.0.0.1:8000" />
+                <button id="testHealthBtn">ลองเปิด /admin/</button>
+                <button id="clearOutputBtn">ล้างผลลัพธ์</button>
+            </div>
+        </section>
+
+        <div class="grid">
+            <section class="panel" id="apiContainer"></section>
+
+            <aside class="panel sticky">
+                <div class="status-row">
+                    <h2 style="margin:0;">Response Viewer</h2>
+                    <span id="lastMethod" class="badge readonly">ยังไม่ยิง</span>
+                </div>
+                <div id="statusBox" class="status">พร้อมใช้งาน</div>
+                <div class="small-buttons">
+                    <button id="copyOutputBtn">คัดลอกผลลัพธ์</button>
+                    <button id="copyCurlBtn">คัดลอก cURL ล่าสุด</button>
+                </div>
+                <div class="example-title">ผลลัพธ์</div>
+                <pre id="output">กดปุ่มจากการ์ดฝั่งซ้ายเพื่อทดสอบ API</pre>
+                <div class="footer-note">
+                    หมายเหตุ: endpoint แบบ ReadOnly ใช้ได้แค่ GET list / GET detail ส่วน endpoint แบบ CRUD ลอง POST,
+                    PUT, PATCH, DELETE ได้จากการ์ดนั้น ๆ
+                </div>
+            </aside>
+        </div>
+    </div>
+
+    <script>
+        const apiGroups = [
+            {
+                title: 'Catalog API',
+                prefix: '/api/catalog/',
+                resources: [
+                    {
+                        name: 'Categories',
+                        path: 'categories/',
+                        detailLabel: 'category_id',
+                        mode: 'readonly',
+                        description: 'หมวดหมู่สินค้า',
+                        methods: ['GET'],
+                        detailExample: '1',
+                        sampleBody: ''
+                    },
+                    {
+                        name: 'Products',
+                        path: 'products/',
+                        detailLabel: 'product_id',
+                        mode: 'readonly',
+                        description: 'ข้อมูลสินค้า รองรับ search และ ordering',
+                        methods: ['GET'],
+                        detailExample: '1',
+                        extraButtons: [
+                            { label: 'GET products?search=wood', query: '?search=wood' },
+                            { label: 'GET products?ordering=price', query: '?ordering=price' },
+                            { label: 'GET products?ordering=-stock_quantity', query: '?ordering=-stock_quantity' }
+                        ],
+                        sampleBody: ''
+                    }
+                ]
+            },
+            {
+                title: 'Cart / Delivery API',
+                prefix: '/api/cart/',
+                resources: [
+                    {
+                        name: 'Carts',
+                        path: 'carts/',
+                        detailLabel: 'cart_id',
+                        mode: 'readonly',
+                        description: 'ตะกร้าของลูกค้า พร้อมรายการ items ในตะกร้า',
+                        methods: ['GET'],
+                        detailExample: '1',
+                        sampleBody: ''
+                    },
+                    {
+                        name: 'Cart Items',
+                        path: 'items/',
+                        detailLabel: 'item_id',
+                        mode: 'crud',
+                        description: 'รายการสินค้าในตะกร้า เพิ่ม แก้ไข ลบ ได้',
+                        methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+                        detailExample: '1',
+                        sampleBody: JSON.stringify({ cart: 1, product: 1, quantity: 2 }, null, 2)
+                    },
+                    {
+                        name: 'Deliveries',
+                        path: 'deliveries/',
+                        detailLabel: 'delivery_id',
+                        mode: 'readonly',
+                        description: 'ข้อมูลการจัดส่ง',
+                        methods: ['GET'],
+                        detailExample: '1',
+                        sampleBody: ''
+                    }
+                ]
+            },
+            {
+                title: 'Orders / Payments API',
+                prefix: '/api/orders/',
+                resources: [
+                    {
+                        name: 'Sale Orders',
+                        path: 'saleorders/',
+                        detailLabel: 'order_id',
+                        mode: 'readonly',
+                        description: 'รายการคำสั่งซื้อ',
+                        methods: ['GET'],
+                        detailExample: '1',
+                        sampleBody: ''
+                    },
+                    {
+                        name: 'Order Details',
+                        path: 'details/',
+                        detailLabel: 'line_number',
+                        mode: 'readonly',
+                        description: 'รายการสินค้าภายในออเดอร์',
+                        methods: ['GET'],
+                        detailExample: '1',
+                        sampleBody: ''
+                    },
+                    {
+                        name: 'Payments',
+                        path: 'payments/',
+                        detailLabel: 'ref_number',
+                        mode: 'readonly',
+                        description: 'ข้อมูลการชำระเงินของออเดอร์',
+                        methods: ['GET'],
+                        detailExample: 'PAY001',
+                        sampleBody: ''
+                    }
+                ]
+            },
+            {
+                title: 'Stock API',
+                prefix: '/api/stock/',
+                resources: [
+                    {
+                        name: 'Suppliers',
+                        path: 'suppliers/',
+                        detailLabel: 'supplier_id',
+                        mode: 'readonly',
+                        description: 'รายชื่อ supplier',
+                        methods: ['GET'],
+                        detailExample: '1',
+                        sampleBody: ''
+                    },
+                    {
+                        name: 'Warehouses',
+                        path: 'warehouses/',
+                        detailLabel: 'warehouse_id',
+                        mode: 'readonly',
+                        description: 'คลังสินค้า',
+                        methods: ['GET'],
+                        detailExample: '1',
+                        sampleBody: ''
+                    },
+                    {
+                        name: 'Locations',
+                        path: 'locations/',
+                        detailLabel: 'location_id',
+                        mode: 'readonly',
+                        description: 'ตำแหน่งในคลังสินค้า',
+                        methods: ['GET'],
+                        detailExample: '1',
+                        sampleBody: ''
+                    },
+                    {
+                        name: 'Restocks',
+                        path: 'restocks/',
+                        detailLabel: 'restock_id',
+                        mode: 'crud',
+                        description: 'ใบสั่งเติมสต็อก สถานะรองรับ Pending, In transit, Received, Rejected',
+                        methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+                        detailExample: '1',
+                        sampleBody: JSON.stringify({
+                            supplier: 1,
+                            employee: 1,
+                            location: 1,
+                            restock_date: '2026-04-10',
+                            restock_status: 'Pending'
+                        }, null, 2)
+                    },
+                    {
+                        name: 'Restock Details',
+                        path: 'restock-details/',
+                        detailLabel: 'restock_detail_id',
+                        mode: 'crud',
+                        description: 'รายการสินค้าในใบ restock',
+                        methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE'],
+                        detailExample: '1',
+                        sampleBody: JSON.stringify({
+                            restock: 1,
+                            product: 1,
+                            quantity: 10
+                        }, null, 2)
+                    }
+                ]
+            },
+            {
+                title: 'Accounts API',
+                prefix: '/api/accounts/',
+                resources: [
+                    {
+                        name: 'Customers',
+                        path: 'customers/',
+                        detailLabel: 'customer_id',
+                        mode: 'readonly',
+                        description: 'ข้อมูลลูกค้า',
+                        methods: ['GET'],
+                        detailExample: '1',
+                        sampleBody: ''
+                    },
+                    {
+                        name: 'Addresses',
+                        path: 'addresses/',
+                        detailLabel: 'address_id',
+                        mode: 'readonly',
+                        description: 'ที่อยู่ลูกค้า',
+                        methods: ['GET'],
+                        detailExample: '1',
+                        sampleBody: ''
+                    },
+                    {
+                        name: 'Employees',
+                        path: 'employees/',
+                        detailLabel: 'employee_id',
+                        mode: 'readonly',
+                        description: 'ข้อมูลพนักงาน',
+                        methods: ['GET'],
+                        detailExample: '1',
+                        sampleBody: ''
+                    }
+                ]
+            }
+        ];
+
+        let lastCurl = '';
+
+        const apiContainer = document.getElementById('apiContainer');
+        const output = document.getElementById('output');
+        const statusBox = document.getElementById('statusBox');
+        const lastMethod = document.getElementById('lastMethod');
+        const baseUrlInput = document.getElementById('baseUrl');
+
+        function badgeForMethod(method) {
+            return `<span class="badge ${method.toLowerCase()}">${method}</span>`;
+        }
+
+        function escapeHtml(text) {
+            return String(text)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        function fullUrl(path) {
+            const base = baseUrlInput.value.trim().replace(/\/$/, '');
+            return `${base}${path.startsWith('/') ? '' : '/'}${path}`;
+        }
+
+        function setStatus(text, method = 'INFO') {
+            statusBox.textContent = text;
+            lastMethod.textContent = method;
+            lastMethod.className = 'badge readonly';
+            if (method === 'GET') lastMethod.className = 'badge get';
+            if (method === 'POST') lastMethod.className = 'badge post';
+            if (method === 'PUT') lastMethod.className = 'badge put';
+            if (method === 'PATCH') lastMethod.className = 'badge patch';
+            if (method === 'DELETE') lastMethod.className = 'badge delete';
+        }
+
+        async function sendRequest({ method, path, body }) {
+            const url = fullUrl(path);
+            const headers = { 'Content-Type': 'application/json' };
+            const options = { method, headers };
+
+            if (body && ['POST', 'PUT', 'PATCH'].includes(method)) {
+                options.body = body;
+            }
+
+            lastCurl = buildCurl(url, method, body);
+            setStatus(`กำลังยิง ${method} ${url}`, method);
+            output.textContent = 'Loading...';
+
+            try {
+                const res = await fetch(url, options);
+                const contentType = res.headers.get('content-type') || '';
+                let data;
+
+                if (contentType.includes('application/json')) {
+                    data = await res.json();
+                } else {
+                    data = await res.text();
+                }
+
+                setStatus(`Status ${res.status} ${res.statusText} | ${method} ${url}`, method);
+                output.textContent = typeof data === 'string' ? data : JSON.stringify(data, null, 2);
+            } catch (error) {
+                setStatus(`Request failed: ${error.message}`, method);
+                output.textContent = error.stack || error.message;
+            }
+        }
+
+        function buildCurl(url, method, body) {
+            let curl = `curl -X ${method} "${url}" -H "Content-Type: application/json"`;
+            if (body && ['POST', 'PUT', 'PATCH'].includes(method)) {
+                const escaped = body.replaceAll('"', '\\"').replace(/\n/g, ' ');
+                curl += ` -d "${escaped}"`;
+            }
+            return curl;
+        }
+
+        function render() {
+            apiContainer.innerHTML = apiGroups.map(group => `
+        <div class="group">
+          <div class="group-title">
+            <h2>${group.title}</h2>
+            <span class="muted">Base prefix: ${group.prefix}</span>
+          </div>
+          <div class="cards">
+            ${group.resources.map(resource => renderCard(group, resource)).join('')}
+          </div>
+        </div>
+      `).join('');
+
+            attachEvents();
+        }
+
+        function renderCard(group, resource) {
+            const path = `${group.prefix}${resource.path}`;
+            const methodsHtml = resource.methods.map(badgeForMethod).join('');
+            const modeBadge = resource.mode === 'crud'
+                ? '<span class="badge writeable">CRUD</span>'
+                : '<span class="badge readonly">Read only</span>';
+
+            const extraButtons = (resource.extraButtons || []).map(btn =>
+                `<button class="extra-query-btn" data-path="${path}${btn.query}">${btn.label}</button>`
+            ).join('');
+
+            return `
+        <div class="card" data-path="${path}" data-mode="${resource.mode}">
+          <div class="card-header">
+            <div>
+              <h3>${resource.name}</h3>
+              <p>${resource.description}</p>
+            </div>
+            ${modeBadge}
+          </div>
+
+          <div class="badges">${methodsHtml}</div>
+          <div class="path">${path}</div>
+
+          <div class="controls">
+            <button class="list-btn">GET list</button>
+            <div>
+              <input class="detail-id" value="${escapeHtml(resource.detailExample)}" placeholder="${resource.detailLabel}" />
+            </div>
+          </div>
+
+          <div class="controls">
+            <button class="detail-btn">GET detail</button>
+            <div class="muted">Detail URL = ${path}{id}/</div>
+          </div>
+
+          ${extraButtons ? `<div class="small-buttons">${extraButtons}</div>` : ''}
+
+          ${resource.mode === 'crud' ? `
+            <div class="example-title">Payload ตัวอย่าง</div>
+            <textarea class="payload">${escapeHtml(resource.sampleBody)}</textarea>
+            <div class="controls-3">
+              <button class="post-btn">POST</button>
+              <button class="put-btn">PUT</button>
+              <button class="patch-btn">PATCH</button>
+            </div>
+            <div class="controls">
+              <button class="delete-btn">DELETE</button>
+              <button class="copy-curl-btn">คัดลอก cURL</button>
+            </div>
+          ` : `
+            <div class="controls">
+              <button class="copy-curl-btn">คัดลอก cURL GET list</button>
+              <div class="muted">resource นี้ยังไม่เปิด POST/PUT/PATCH/DELETE</div>
+            </div>
+          `}
+        </div>
+      `;
+        }
+
+        function attachEvents() {
+            document.querySelectorAll('.card').forEach(card => {
+                const path = card.dataset.path;
+                const detailIdInput = card.querySelector('.detail-id');
+                const payloadArea = card.querySelector('.payload');
+
+                card.querySelector('.list-btn').addEventListener('click', () => {
+                    sendRequest({ method: 'GET', path });
+                });
+
+                card.querySelector('.detail-btn').addEventListener('click', () => {
+                    const id = detailIdInput.value.trim();
+                    if (!id) return alert('กรอก id ก่อน');
+                    sendRequest({ method: 'GET', path: `${path}${encodeURIComponent(id)}/` });
+                });
+
+                card.querySelectorAll('.extra-query-btn').forEach(btn => {
+                    btn.addEventListener('click', () => sendRequest({ method: 'GET', path: btn.dataset.path }));
+                });
+
+                const copyCurlBtn = card.querySelector('.copy-curl-btn');
+                copyCurlBtn.addEventListener('click', async () => {
+                    let curl;
+                    const id = detailIdInput.value.trim();
+                    if (payloadArea) {
+                        curl = buildCurl(fullUrl(path), 'POST', payloadArea.value.trim());
+                    } else {
+                        curl = buildCurl(fullUrl(path), 'GET', '');
+                    }
+                    await navigator.clipboard.writeText(curl);
+                    setStatus('คัดลอก cURL แล้ว');
+                });
+
+                const postBtn = card.querySelector('.post-btn');
+                if (postBtn) {
+                    postBtn.addEventListener('click', () => sendRequest({
+                        method: 'POST',
+                        path,
+                        body: payloadArea.value.trim()
+                    }));
+                }
+
+                const putBtn = card.querySelector('.put-btn');
+                if (putBtn) {
+                    putBtn.addEventListener('click', () => {
+                        const id = detailIdInput.value.trim();
+                        if (!id) return alert('กรอก id ก่อน PUT');
+                        sendRequest({ method: 'PUT', path: `${path}${encodeURIComponent(id)}/`, body: payloadArea.value.trim() });
+                    });
+                }
+
+                const patchBtn = card.querySelector('.patch-btn');
+                if (patchBtn) {
+                    patchBtn.addEventListener('click', () => {
+                        const id = detailIdInput.value.trim();
+                        if (!id) return alert('กรอก id ก่อน PATCH');
+                        sendRequest({ method: 'PATCH', path: `${path}${encodeURIComponent(id)}/`, body: payloadArea.value.trim() });
+                    });
+                }
+
+                const deleteBtn = card.querySelector('.delete-btn');
+                if (deleteBtn) {
+                    deleteBtn.addEventListener('click', () => {
+                        const id = detailIdInput.value.trim();
+                        if (!id) return alert('กรอก id ก่อน DELETE');
+                        sendRequest({ method: 'DELETE', path: `${path}${encodeURIComponent(id)}/` });
+                    });
+                }
+            });
+        }
+
+        document.getElementById('clearOutputBtn').addEventListener('click', () => {
+            output.textContent = 'ล้างผลลัพธ์แล้ว';
+            setStatus('พร้อมใช้งาน');
+            lastCurl = '';
+        });
+
+        document.getElementById('testHealthBtn').addEventListener('click', () => {
+            sendRequest({ method: 'GET', path: '/admin/' });
+        });
+
+        document.getElementById('copyOutputBtn').addEventListener('click', async () => {
+            await navigator.clipboard.writeText(output.textContent);
+            setStatus('คัดลอกผลลัพธ์แล้ว');
+        });
+
+        document.getElementById('copyCurlBtn').addEventListener('click', async () => {
+            if (!lastCurl) {
+                alert('ยังไม่มี request ล่าสุด');
+                return;
+            }
+            await navigator.clipboard.writeText(lastCurl);
+            setStatus('คัดลอก cURL ล่าสุดแล้ว');
+        });
+
+        render();
+    </script>
+</body>
+
+</html>
