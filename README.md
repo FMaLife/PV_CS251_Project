@@ -1,299 +1,222 @@
-venv\Scripts\activate
+.venv\Scripts\activate
 python manage.py runserver
 http://127.0.0.1:8000/admin/
 
+python -m http.server 3000
+http://127.0.0.1:3000/frontend/preview.html
+
+
 # README Setup Guide
 
-คู่มือนี้อธิบายขั้นตอนสำหรับเพื่อนในทีมตั้งแต่ clone โปรเจกต์, ติดตั้ง Python และ PostgreSQL, รัน Django migrations, สร้าง superuser และเปิดหน้า Django Admin ได้สำเร็จ
+คู่มือนี้สรุปแค่ขั้นตอนที่ต้องพิมพ์ใน terminal และผลที่ควรเกิดขึ้น เพื่อให้เพื่อนในทีมเปิด backend, Django Admin และหน้าพรีวิวฟร้อนเอนด์ได้
 
-> คู่มือนี้อิงการใช้งานบน **Windows + PowerShell + Django + PostgreSQL**
+## 1) Clone โปรเจกต์
+
+พิมพ์ใน PowerShell:
+
+```powershell
+git clone https://github.com/FMaLife/PV_CS251_Project.git
+cd PV_CS251_Project
+```
+
+สิ่งที่ควรเกิดขึ้น:
+- จะมีโฟลเดอร์ `PV_CS251_Project` ถูกสร้างขึ้น
+- เมื่อ `cd` เข้าไปแล้ว จะเห็นโฟลเดอร์ `backend` และ `frontend`
 
 ---
 
-## 1) สิ่งที่ต้องมีในเครื่องก่อน
-
-ติดตั้งโปรแกรมเหล่านี้ก่อน:
-
-- Git
-- Python 3.11
-- PostgreSQL
-- pgAdmin 4
-- VS Code หรือ editor ที่ถนัด
-
-เช็กใน PowerShell ได้ด้วยคำสั่ง:
-
-```powershell
-git --version
-python --version
-pip --version
-```
-
----
-
-## 2) Clone โปรเจกต์จาก GitHub
-
-เปิด PowerShell แล้วไปโฟลเดอร์ที่ต้องการเก็บงาน เช่น
-
-```powershell
-cd D:\
-mkdir CS251
-cd CS251
-```
-
-จากนั้น clone repo:
-
-```powershell
-git clone <URL-REPO>
-```
-
-ตัวอย่าง:
-
-```powershell
-git clone https://github.com/ชื่อเจ้าของrepo/ชื่อrepo.git
-```
-
-แล้วเข้าโฟลเดอร์โปรเจกต์:
-
-```powershell
-cd ชื่อrepo
-```
-
-ถ้าต้องใช้ branch เฉพาะ:
-
-```powershell
-git branch -a
-git checkout ชื่อbranch
-```
-
-ถ้า branch อยู่บน remote แต่ยังไม่มีในเครื่อง:
-
-```powershell
-git checkout -b ชื่อbranch origin/ชื่อbranch
-```
-
----
-
-## 3) เข้าโฟลเดอร์ backend ที่มี `manage.py`
+## 2) เข้า backend
 
 ```powershell
 cd backend
 dir
 ```
 
-ควรเห็นไฟล์ประมาณนี้:
-
-```text
-manage.py
-backend\
-accounts\
-stock\
-catalog\
-cart_delivery\
-order_payment\
-```
+สิ่งที่ควรเกิดขึ้น:
+- ควรเห็นไฟล์ `manage.py`
+- ควรเห็นโฟลเดอร์ประมาณนี้:
+  - `Group10_CS251_Project`
+  - `accounts`
+  - `stock`
+  - `catalog`
+  - `cart_delivery`
+  - `order_payment`
 
 ---
 
-## 4) สร้าง virtual environment
-
-อยู่ในโฟลเดอร์ `backend` แล้วรัน:
+## 3) สร้างและเปิด virtual environment
 
 ```powershell
 python -m venv venv
-```
-
----
-
-## 5) Activate virtual environment
-
-ทุกครั้งที่เปิด terminal ใหม่ ต้อง activate ก่อน:
-
-```powershell
 venv\Scripts\activate
 ```
 
-ถ้าสำเร็จจะเห็น `(venv)` ขึ้นหน้าบรรทัดคำสั่ง
+สิ่งที่ควรเกิดขึ้น:
+- จะมีโฟลเดอร์ `venv`
+- หลัง activate แล้ว บรรทัดคำสั่งจะขึ้น `(venv)` ด้านหน้า
+
+ตัวอย่าง:
+
+```text
+(venv) PS D:\CS251\PV_CS251_Project\backend>
+```
 
 ---
 
-## 6) ติดตั้ง dependencies
-
-ถ้ามี `requirements.txt` ให้รัน:
+## 4) ติดตั้ง package
 
 ```powershell
 pip install -r requirements.txt
 ```
 
-ถ้ายังไม่มี ให้ติดตั้งขั้นต่ำอย่างน้อย:
+สิ่งที่ควรเกิดขึ้น:
+- package ต่าง ๆ จะถูกติดตั้ง
+- ถ้าสำเร็จจะเห็นข้อความประมาณ `Successfully installed ...`
+
+ถ้าไม่มี `requirements.txt` ให้ใช้:
 
 ```powershell
-pip install django psycopg2-binary
-```
-
-เช็กเวอร์ชัน Django:
-
-```powershell
-python -m django --version
+pip install django psycopg2-binary python-decouple
 ```
 
 ---
 
-## 7) สร้างฐานข้อมูลใน PostgreSQL
+## 5) สร้างฐานข้อมูล PostgreSQL และตั้งค่า `.env`
 
-### วิธีผ่าน pgAdmin
-
-1. เปิด **pgAdmin 4**
-2. ล็อกอินเข้า PostgreSQL server
-3. คลิกขวาที่ `Databases`
-4. เลือก **Create > Database...**
-5. ตั้งชื่อ database เช่น:
+ให้สร้าง database ใน PostgreSQL ไว้ก่อน เช่นชื่อ:
 
 ```text
 smart_furniture_db
 ```
 
-6. กด Save
-
----
-
-## 8) ตั้งค่า `DATABASES` ใน Django
-
-เปิดไฟล์ `settings.py` แล้วหาส่วน `DATABASES`
-
-ตัวอย่าง:
-
-```python
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'smart_furniture_db',
-        'USER': 'postgres',
-        'PASSWORD': 'รหัสผ่าน_postgres',
-        'HOST': 'localhost',
-        'PORT': '5432',
-    }
-}
-```
-
-ถ้าโปรเจกต์ใช้ `.env` ให้ใส่ค่าให้ตรงกับเครื่องตัวเอง
-
-ตัวอย่าง `.env`:
+แล้วสร้างไฟล์ `.env` ในโฟลเดอร์ `backend` โดยใส่ค่าประมาณนี้:
 
 ```env
+SECRET_KEY=django-insecure-change-this
+DEBUG=True
+
 DB_NAME=smart_furniture_db
 DB_USER=postgres
-DB_PASSWORD=รหัสผ่าน_postgres
+DB_PASSWORD=รหัสผ่านของตัวเอง
 DB_HOST=localhost
 DB_PORT=5432
 ```
 
----
-
-## 9) เช็ก `INSTALLED_APPS`
-
-ใน `settings.py` ควรมี app เหล่านี้
-
-```python
-'accounts',
-'stock',
-'catalog',
-'cart_delivery',
-'order_payment',
-```
-
-และ app มาตรฐานของ Django:
-
-```python
-'django.contrib.admin',
-'django.contrib.auth',
-'django.contrib.contenttypes',
-'django.contrib.sessions',
-'django.contrib.messages',
-'django.contrib.staticfiles',
-```
+สิ่งที่ควรเกิดขึ้น:
+- Django จะสามารถเชื่อมต่อ PostgreSQL ได้ตอนรัน migration
 
 ---
 
-## 10) รัน migrations
-
-ถ้ามี migration อยู่แล้ว:
+## 6) รัน migrations
 
 ```powershell
 python manage.py migrate
 ```
 
-ถ้ายังไม่มี migration ของ app ให้รัน:
+สิ่งที่ควรเกิดขึ้น:
+- จะเห็นข้อความประมาณนี้:
 
-```powershell
-python manage.py makemigrations
-python manage.py migrate
+```text
+Operations to perform:
+  Apply all migrations: admin, auth, contenttypes, sessions, ...
+Running migrations:
+  Applying ...
+  OK
 ```
+
+แปลว่าตารางถูกสร้างในฐานข้อมูลแล้ว
 
 ---
 
-## 11) สร้าง superuser
-
-ใช้สำหรับล็อกอินหน้า admin:
+## 7) สร้าง superuser
 
 ```powershell
 python manage.py createsuperuser
 ```
 
-กรอก:
+สิ่งที่ควรเกิดขึ้น:
+- ระบบจะถาม `Username`
+- ระบบจะถาม `Email address`
+- ระบบจะถาม `Password`
 
-- Username
-- Email address
-- Password
+ถ้าสำเร็จจะเห็นประมาณนี้:
+
+```text
+Superuser created successfully.
+```
 
 ---
 
-## 12) รัน Django server
+## 8) รัน Django server
 
 ```powershell
 python manage.py runserver
 ```
 
-ถ้าสำเร็จ จะขึ้นประมาณนี้:
+สิ่งที่ควรเกิดขึ้น:
+- จะเห็นข้อความประมาณนี้:
 
 ```text
+Watching for file changes with StatReloader
+Performing system checks...
+
+System check identified no issues (0 silenced).
 Starting development server at http://127.0.0.1:8000/
 ```
 
+แปลว่า backend เปิดแล้ว
+
 ---
 
-## 13) เปิดหน้า admin
+## 9) เปิด Django Admin
 
-เปิด browser แล้วเข้า:
+เปิด Chrome แล้วเข้า URL นี้:
 
 ```text
 http://127.0.0.1:8000/admin/
 ```
 
-หรือ
-
-```text
-http://localhost:8000/admin/
-```
-
-จากนั้นล็อกอินด้วย superuser ที่สร้างไว้
+สิ่งที่ควรเกิดขึ้น:
+- จะเห็นหน้า login ของ Django Admin
+- ให้ล็อกอินด้วย superuser ที่สร้างไว้
+- ถ้าสำเร็จจะเข้าหน้าจัดการข้อมูลหลังบ้าน
 
 ---
 
-## 14) ลำดับคำสั่งแบบสั้นสุด
+## 10) เปิดหน้าพรีวิวฟร้อนเอนด์
+
+เปิด terminal ใหม่ แล้วพิมพ์:
 
 ```powershell
-git clone <URL-REPO>
-cd ชื่อrepo
-cd backend
-python -m venv venv
+cd D:\CS251\PV_CS251_Project\frontend
+dir
+```
+
+สิ่งที่ควรเกิดขึ้น:
+- ควรเห็นไฟล์ HTML สำหรับทดลองหน้าเว็บ เช่น
+  - `preview.html`
+  - `pv_cs251_api_demo.html`
+  - `admin_inventory_demo.html`
+
+จากนั้นให้เปิดไฟล์ HTML ด้วย Chrome หรือ Live Server
+
+สิ่งที่ควรเกิดขึ้น:
+- จะเห็นหน้าเว็บพรีวิวของฟร้อนเอนด์
+- ถ้า backend ยังรันอยู่ที่ `http://127.0.0.1:8000` หน้าเว็บจะสามารถเรียก API ได้
+
+---
+
+## 11) ถ้าจะเปิดโปรเจกต์รอบถัดไป
+
+ครั้งต่อไปไม่ต้องสร้าง venv ใหม่ แค่พิมพ์:
+
+```powershell
+cd D:\CS251\PV_CS251_Project\backend
 venv\Scripts\activate
-pip install -r requirements.txt
-python manage.py migrate
-python manage.py createsuperuser
 python manage.py runserver
 ```
 
-จากนั้นเปิด:
+แล้วเปิด:
 
 ```text
 http://127.0.0.1:8000/admin/
@@ -301,81 +224,32 @@ http://127.0.0.1:8000/admin/
 
 ---
 
-## 15) ถ้าเปิด `/admin/` ได้ แต่ไม่เห็น model
+## 12) ถ้ามีปัญหา
 
-ให้เช็กไฟล์ `admin.py` ของแต่ละ app ว่ามีการ register model หรือยัง เช่น:
-
-```python
-from django.contrib import admin
-from .models import Product
-
-admin.site.register(Product)
-```
-
----
-
-## 16) ปัญหาที่พบบ่อย
-
-### 1. `ModuleNotFoundError`
-ยังไม่ได้ activate venv หรือยังไม่ได้ install package
+### เปิด server ไม่ได้
+ให้เช็กว่า activate venv แล้วหรือยัง
 
 ```powershell
 venv\Scripts\activate
-pip install -r requirements.txt
 ```
 
-### 2. `database "..." does not exist`
-ยังไม่ได้สร้าง database ใน PostgreSQL
+### ต่อ database ไม่ได้
+ให้เช็กว่า PostgreSQL เปิดอยู่ และค่าใน `.env` ตรงกับเครื่องตัวเอง
 
-### 3. `connection to server at "localhost" failed`
-PostgreSQL ยังไม่เปิด หรือค่าการเชื่อมต่อใน `settings.py` ไม่ตรง
+### เปิด admin ไม่ได้
+ให้เช็กว่า runserver อยู่ และเข้า URL นี้ให้ถูก:
 
-### 4. `psycopg2` error
-ยังไม่ได้ลง PostgreSQL driver
-
-```powershell
-pip install psycopg2-binary
+```text
+http://127.0.0.1:8000/admin/
 ```
 
-### 5. `relation ... already exists`
-ใช้ฐานข้อมูลเก่าที่เคยมีตารางอยู่แล้ว อาจต้องลบ database เดิมแล้วสร้างใหม่
+### หน้าเว็บฟร้อนเปิดได้ แต่เรียก API ไม่ได้
+ให้เช็กว่า backend ยังรันอยู่ที่:
 
-### 6. เข้าหน้า admin ได้ แต่ล็อกอินไม่ได้
-ให้สร้าง superuser ใหม่
-
-```powershell
-python manage.py createsuperuser
+```text
+http://127.0.0.1:8000
 ```
 
 ---
 
-## 17) เวลาเปิดโปรเจกต์รอบถัดไป
-
-ถ้า setup ครั้งแรกเสร็จแล้ว รอบต่อไปใช้แค่นี้:
-
-```powershell
-cd D:\CS251\ชื่อrepo\backend
-venv\Scripts\activate
-python manage.py runserver
-```
-
-ถ้ามี migration ใหม่จากเพื่อน ให้ pull แล้วรัน:
-
-```powershell
-git pull
-python manage.py migrate
-```
-
----
-
-## 18) ข้อแนะนำสำหรับงานทีม
-
-- ให้ทุกคนใช้ Python เวอร์ชันใกล้กัน
-- ใช้ชื่อ database คนละชื่อถ้ากลัวชนกัน
-- อย่า commit โฟลเดอร์ `venv/`
-- ควรมีไฟล์ `requirements.txt`
-- ถ้าเปลี่ยน models แล้ว commit migration ขึ้น git ด้วย
-
----
-
-จบขั้นตอน เพื่อนในทีมควร clone โปรเจกต์, ตั้ง PostgreSQL, migrate และเปิดหน้า admin ได้เรียบร้อย
+จบขั้นตอน เพื่อนในทีมควรเปิด backend, เข้า Django Admin และเปิดหน้าพรีวิวฟร้อนเอนด์ได้
