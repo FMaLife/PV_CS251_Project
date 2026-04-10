@@ -1,4 +1,5 @@
 from rest_framework import serializers
+
 from .models import Category, Product, ProductImage
 
 
@@ -34,3 +35,24 @@ class ProductSerializer(serializers.ModelSerializer):
             "location",
             "images",
         ]
+        read_only_fields = ["product_id", "category_name", "images"]
+
+    def validate_price(self, value):
+        if value < 0:
+            raise serializers.ValidationError("price cannot be negative")
+        return value
+
+    def validate_stock_quantity(self, value):
+        if value < 0:
+            raise serializers.ValidationError("stock_quantity cannot be negative")
+        return value
+
+    def validate(self, attrs):
+        for field_name in ("height", "width", "length"):
+            value = attrs.get(field_name)
+            if value is not None and value <= 0:
+                raise serializers.ValidationError(
+                    {field_name: f"{field_name} must be greater than 0"}
+                )
+        return attrs
+

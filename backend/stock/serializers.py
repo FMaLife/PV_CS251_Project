@@ -1,4 +1,5 @@
 from rest_framework import serializers
+
 from .models import Supplier, Warehouse, WarehouseLocation, RestockOrder, RestockDetail
 
 
@@ -12,17 +13,20 @@ class SupplierSerializer(serializers.ModelSerializer):
             "phone_num",
             "address",
         ]
+        read_only_fields = ["supplier_id"]
+
+    def validate_phone_num(self, value):
+        if not value.isdigit():
+            raise serializers.ValidationError("phone_num must contain digits only")
+        if len(value) not in (9, 10):
+            raise serializers.ValidationError("phone_num should be 9 or 10 digits")
+        return value
 
 
 class WarehouseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Warehouse
-        fields = [
-            "warehouse_id",
-            "wname",
-            "wphone",
-            "waddress",
-        ]
+        fields = ["warehouse_id", "wname", "wphone", "waddress"]
 
 
 class WarehouseLocationSerializer(serializers.ModelSerializer):
@@ -30,14 +34,7 @@ class WarehouseLocationSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = WarehouseLocation
-        fields = [
-            "location_id",
-            "warehouse",
-            "warehouse_name",
-            "aisle",
-            "zone",
-            "bin",
-        ]
+        fields = ["location_id", "warehouse", "warehouse_name", "aisle", "zone", "bin"]
 
 
 class RestockDetailSerializer(serializers.ModelSerializer):
@@ -52,6 +49,12 @@ class RestockDetailSerializer(serializers.ModelSerializer):
             "product_name",
             "quantity",
         ]
+        read_only_fields = ["restock_detail_id", "product_name"]
+
+    def validate_quantity(self, value):
+        if value <= 0:
+            raise serializers.ValidationError("quantity must be greater than 0")
+        return value
 
 
 class RestockOrderSerializer(serializers.ModelSerializer):
@@ -74,9 +77,17 @@ class RestockOrderSerializer(serializers.ModelSerializer):
             "restock_status",
             "details",
         ]
+        read_only_fields = [
+            "restock_id",
+            "supplier_name",
+            "employee_name",
+            "location_name",
+            "details",
+        ]
 
     def get_employee_name(self, obj):
         return f"{obj.employee.efirst_name} {obj.employee.elast_name}"
 
     def get_location_name(self, obj):
         return str(obj.location)
+
