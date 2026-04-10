@@ -1,0 +1,1165 @@
+<!DOCTYPE html>
+<html lang="th">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>PV CS251 - Admin Inventory Demo</title>
+  <style>
+    :root {
+      --bg: #0f172a;
+      --panel: #111827;
+      --panel-2: #1f2937;
+      --muted: #94a3b8;
+      --text: #e5e7eb;
+      --accent: #38bdf8;
+      --accent-2: #22c55e;
+      --danger: #ef4444;
+      --warn: #f59e0b;
+      --border: rgba(148, 163, 184, 0.22);
+      --shadow: 0 18px 45px rgba(0, 0, 0, 0.35);
+      --radius: 18px;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background:
+        radial-gradient(circle at top right, rgba(56, 189, 248, 0.18), transparent 30%),
+        radial-gradient(circle at top left, rgba(34, 197, 94, 0.12), transparent 22%),
+        var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    .page {
+      width: min(1400px, calc(100vw - 32px));
+      margin: 24px auto 40px;
+      display: grid;
+      gap: 18px;
+    }
+
+    .panel {
+      background: linear-gradient(180deg, rgba(17, 24, 39, 0.96), rgba(15, 23, 42, 0.96));
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 18px;
+    }
+
+    .hero {
+      display: grid;
+      gap: 16px;
+      grid-template-columns: 1.4fr 1fr;
+      align-items: center;
+    }
+
+    .title {
+      font-size: clamp(1.6rem, 3vw, 2.4rem);
+      font-weight: 800;
+      margin: 0 0 8px;
+      letter-spacing: -0.02em;
+    }
+
+    .subtitle,
+    .muted {
+      color: var(--muted);
+      line-height: 1.55;
+    }
+
+    .toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 16px;
+    }
+
+    .config-box {
+      display: grid;
+      gap: 14px;
+      background: rgba(31, 41, 55, 0.55);
+      border-radius: 16px;
+      padding: 16px;
+      border: 1px solid var(--border);
+    }
+
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+      gap: 14px;
+    }
+
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .card {
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px;
+    }
+
+    .metric-label {
+      color: var(--muted);
+      font-size: 0.92rem;
+      margin-bottom: 8px;
+    }
+
+    .metric-value {
+      font-size: clamp(1.4rem, 3vw, 2.1rem);
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    h2,
+    h3 {
+      margin: 0 0 6px;
+      letter-spacing: -0.02em;
+    }
+
+    .field-grid {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .field {
+      display: grid;
+      gap: 6px;
+    }
+
+    .field.full {
+      grid-column: 1 / -1;
+    }
+
+    label {
+      font-size: 0.9rem;
+      color: #cbd5e1;
+    }
+
+    input,
+    select,
+    button,
+    textarea {
+      font: inherit;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: rgba(15, 23, 42, 0.88);
+      color: var(--text);
+      padding: 12px 14px;
+      outline: none;
+    }
+
+    textarea {
+      min-height: 100px;
+      resize: vertical;
+    }
+
+    input:focus,
+    select:focus,
+    textarea:focus {
+      border-color: rgba(56, 189, 248, 0.9);
+      box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.12);
+    }
+
+    button {
+      cursor: pointer;
+      transition: transform 0.15s ease, opacity 0.15s ease, border-color 0.15s ease;
+      font-weight: 700;
+    }
+
+    button:hover {
+      transform: translateY(-1px);
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .primary {
+      background: linear-gradient(135deg, rgba(56, 189, 248, 0.9), rgba(37, 99, 235, 0.9));
+      border-color: transparent;
+      color: white;
+    }
+
+    .secondary {
+      background: rgba(30, 41, 59, 0.95);
+    }
+
+    .success {
+      background: linear-gradient(135deg, rgba(34, 197, 94, 0.92), rgba(21, 128, 61, 0.92));
+      border-color: transparent;
+      color: white;
+    }
+
+    .warning {
+      border-left: 4px solid var(--warn);
+      padding: 14px 16px;
+      background: rgba(245, 158, 11, 0.08);
+      border-radius: 14px;
+      color: #fde68a;
+      line-height: 1.55;
+    }
+
+    .status-box {
+      min-height: 52px;
+      display: flex;
+      align-items: center;
+      padding: 12px 14px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: rgba(15, 23, 42, 0.55);
+      color: #cbd5e1;
+      white-space: pre-wrap;
+    }
+
+    .status-box.ok {
+      border-color: rgba(34, 197, 94, 0.45);
+      color: #bbf7d0;
+    }
+
+    .status-box.error {
+      border-color: rgba(239, 68, 68, 0.45);
+      color: #fecaca;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      overflow: hidden;
+      border-radius: 14px;
+      background: rgba(2, 6, 23, 0.45);
+    }
+
+    th,
+    td {
+      text-align: left;
+      padding: 12px 10px;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.14);
+      vertical-align: top;
+      font-size: 0.95rem;
+    }
+
+    th {
+      color: #cbd5e1;
+      font-size: 0.87rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      background: rgba(15, 23, 42, 0.8);
+      position: sticky;
+      top: 0;
+    }
+
+    .table-wrap {
+      overflow: auto;
+      max-height: 520px;
+      border-radius: 14px;
+      border: 1px solid rgba(148, 163, 184, 0.15);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 5px 10px;
+      border-radius: 999px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      border: 1px solid rgba(148, 163, 184, 0.22);
+      background: rgba(30, 41, 59, 0.65);
+      color: #e2e8f0;
+      white-space: nowrap;
+    }
+
+    .badge.pending {
+      color: #fde68a;
+      border-color: rgba(245, 158, 11, 0.35);
+    }
+
+    .badge.transit {
+      color: #bfdbfe;
+      border-color: rgba(59, 130, 246, 0.35);
+    }
+
+    .badge.received {
+      color: #bbf7d0;
+      border-color: rgba(34, 197, 94, 0.4);
+    }
+
+    .badge.rejected {
+      color: #fecaca;
+      border-color: rgba(239, 68, 68, 0.35);
+    }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .inline-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .detail-list {
+      display: grid;
+      gap: 8px;
+    }
+
+    .detail-item {
+      border: 1px solid rgba(148, 163, 184, 0.16);
+      background: rgba(15, 23, 42, 0.45);
+      border-radius: 12px;
+      padding: 10px 12px;
+    }
+
+    pre {
+      margin: 0;
+      padding: 14px;
+      border-radius: 14px;
+      overflow: auto;
+      background: #020617;
+      border: 1px solid rgba(148, 163, 184, 0.16);
+      color: #dbeafe;
+      font-size: 0.9rem;
+      line-height: 1.55;
+    }
+
+    .snippet {
+      display: grid;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .small {
+      font-size: 0.85rem;
+      color: var(--muted);
+    }
+
+    .nowrap {
+      white-space: nowrap;
+    }
+
+    .right {
+      text-align: right;
+    }
+
+    @media (max-width: 1100px) {
+
+      .hero,
+      .grid-2,
+      .grid-4,
+      .field-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page">
+    <section class="panel hero">
+      <div>
+        <p class="badge">Admin flow ที่ผูกกับ API จริงของโปรเจกต์ตอนนี้</p>
+        <h1 class="title">Inventory & Restock Admin Demo</h1>
+        <p class="subtitle">
+          หน้าเว็บนี้ออกแบบตามโฟลว์ที่ backend ปัจจุบันทำได้จริง: ดูสต๊อก, ดู location,
+          สร้าง restock order, เพิ่มสินค้าเข้า order, และเปลี่ยนสถานะเป็น <strong>Received</strong>
+          เพื่อให้ stock เพิ่มตาม logic ฝั่ง Django.
+        </p>
+        <div class="toolbar">
+          <button class="primary" id="loadAllBtn">โหลดข้อมูลทั้งหมด</button>
+          <button class="secondary" id="refreshBtn">รีเฟรช</button>
+          <button class="secondary" id="fillDemoBtn">เติมข้อมูลตัวอย่างในฟอร์ม</button>
+        </div>
+      </div>
+      <div class="config-box">
+        <div class="field">
+          <label for="baseUrl">Backend Base URL</label>
+          <input id="baseUrl" value="http://127.0.0.1:8000" />
+        </div>
+        <div class="warning">
+          ถ้าจะเปิดไฟล์นี้แยกจาก Django ตรง ๆ ผ่าน browser ให้ระวังเรื่อง CORS ด้วย
+          เพราะ settings ตอนนี้อนุญาต origin แค่ <code>localhost:3000</code> และ <code>127.0.0.1:3000</code>.
+          ถ้าจะเทสง่ายสุด ให้รันฟร้อนบนพอร์ต 3000 หรือเอาไฟล์นี้ไปวางเป็น template ฝั่ง Django.
+        </div>
+        <div class="status-box" id="statusBox">พร้อมใช้งาน</div>
+      </div>
+    </section>
+
+    <section class="grid-4">
+      <div class="panel card">
+        <div class="metric-label">จำนวนสินค้า</div>
+        <div class="metric-value" id="metricProducts">-</div>
+      </div>
+      <div class="panel card">
+        <div class="metric-label">จำนวนสต๊อกรวม</div>
+        <div class="metric-value" id="metricStock">-</div>
+      </div>
+      <div class="panel card">
+        <div class="metric-label">ตำแหน่งเก็บของ</div>
+        <div class="metric-value" id="metricLocations">-</div>
+      </div>
+      <div class="panel card">
+        <div class="metric-label">Supplier</div>
+        <div class="metric-value" id="metricSuppliers">-</div>
+      </div>
+      <div class="panel card">
+        <div class="metric-label">Restock ที่ยังไม่ Received</div>
+        <div class="metric-value" id="metricPending">-</div>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="section-head">
+        <div>
+          <h2>Supplier Directory</h2>
+          <div class="muted">อ่านข้อมูลจาก <code>/api/stock/suppliers/</code>
+            เพื่อให้แอดมินเลือกคู่ค้าและเช็กข้อมูลติดต่อได้จากหน้าเดียว</div>
+        </div>
+      </div>
+      <div class="field-grid" style="margin-bottom: 14px;">
+        <div class="field">
+          <label for="supplierSearch">ค้นหา supplier</label>
+          <input id="supplierSearch" placeholder="เช่น company, person, phone" />
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Company</th>
+              <th>Contact Person</th>
+              <th>Phone</th>
+              <th>Address</th>
+            </tr>
+          </thead>
+          <tbody id="suppliersBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="grid-2">
+      <div class="panel">
+        <div class="section-head">
+          <div>
+            <h2>Product Inventory</h2>
+            <div class="muted">อ่านข้อมูลจาก <code>/api/catalog/products/</code> แล้วจับคู่กับ category และ location
+            </div>
+          </div>
+        </div>
+        <div class="field-grid" style="margin-bottom: 14px;">
+          <div class="field">
+            <label for="productSearch">ค้นหาสินค้า</label>
+            <input id="productSearch" placeholder="เช่น sofa, white, chair" />
+          </div>
+          <div class="field">
+            <label for="categoryFilter">หมวดหมู่</label>
+            <select id="categoryFilter">
+              <option value="">ทั้งหมด</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="locationFilter">Location</label>
+            <select id="locationFilter">
+              <option value="">ทั้งหมด</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="stockFilter">กรองตามสต๊อก</label>
+            <select id="stockFilter">
+              <option value="">ทั้งหมด</option>
+              <option value="low">สต๊อกต่ำ (≤ 10)</option>
+              <option value="out">หมดสต๊อก (= 0)</option>
+              <option value="ok">มากกว่า 10</option>
+            </select>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Product</th>
+                <th>Category</th>
+                <th>Location</th>
+                <th>Color</th>
+                <th>Size</th>
+                <th class="right">Price</th>
+                <th class="right">Stock</th>
+              </tr>
+            </thead>
+            <tbody id="productsBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="section-head">
+          <div>
+            <h2>Create Restock Order</h2>
+            <div class="muted">POST ไปที่ <code>/api/stock/restocks/</code> ก่อน แล้วค่อยเพิ่มรายละเอียดสินค้า</div>
+          </div>
+        </div>
+        <form id="restockForm" class="field-grid">
+          <div class="field">
+            <label for="supplierSelect">Supplier</label>
+            <select id="supplierSelect" required></select>
+          </div>
+          <div class="field">
+            <label for="employeeSelect">Employee</label>
+            <select id="employeeSelect" required></select>
+          </div>
+          <div class="field">
+            <label for="locationSelect">Warehouse Location</label>
+            <select id="locationSelect" required></select>
+          </div>
+          <div class="field">
+            <label for="restockDate">Restock Date</label>
+            <input id="restockDate" type="date" required />
+          </div>
+          <div class="field full">
+            <label for="restockStatus">Status</label>
+            <select id="restockStatus" required>
+              <option value="Pending">Pending</option>
+              <option value="In transit">In transit</option>
+              <option value="Received">Received</option>
+              <option value="Rejected">Rejected</option>
+            </select>
+          </div>
+          <div class="field full">
+            <button class="primary" type="submit">สร้าง Restock Order</button>
+          </div>
+        </form>
+
+        <div style="height: 14px;"></div>
+
+        <div class="section-head">
+          <div>
+            <h2>Add Item to Restock</h2>
+            <div class="muted">POST ไปที่ <code>/api/stock/restock-details/</code></div>
+          </div>
+        </div>
+        <form id="detailForm" class="field-grid">
+          <div class="field">
+            <label for="detailRestockSelect">Restock Order</label>
+            <select id="detailRestockSelect" required></select>
+          </div>
+          <div class="field">
+            <label for="detailProductSelect">Product</label>
+            <select id="detailProductSelect" required></select>
+          </div>
+          <div class="field full">
+            <label for="detailQty">Quantity</label>
+            <input id="detailQty" type="number" min="1" value="1" required />
+          </div>
+          <div class="field full">
+            <button class="success" type="submit">เพิ่มสินค้าเข้า Restock</button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <section class="panel">
+      <div class="section-head">
+        <div>
+          <h2>Restock Orders</h2>
+          <div class="muted">ตารางนี้ใช้ดูรายการที่สร้างแล้ว และเปลี่ยนสถานะทีหลังได้เลย</div>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Date</th>
+              <th>Supplier</th>
+              <th>Employee</th>
+              <th>Location</th>
+              <th>Status</th>
+              <th>Items</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody id="restocksBody"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="grid-2">
+      <div class="panel">
+        <div class="section-head">
+          <div>
+            <h2>API snippets ที่ก็อปไปใช้ต่อได้</h2>
+            <div class="muted">เขียนเป็น fetch แบบ vanilla JS เพื่อให้ย้ายไป React/Vue/Next ได้ง่าย</div>
+          </div>
+        </div>
+        <div class="snippet">
+          <div class="inline-actions">
+            <strong>1) ดึงสินค้า</strong>
+            <button class="secondary copy-btn" data-target="codeProducts">Copy</button>
+          </div>
+          <pre id="codeProducts">const BASE_URL = "http://127.0.0.1:8000";
+
+async function getProducts() {
+  const res = await fetch(`${BASE_URL}/api/catalog/products/`);
+  if (!res.ok) throw new Error("Load products failed");
+  return await res.json();
+}</pre>
+        </div>
+        <div class="snippet">
+          <div class="inline-actions">
+            <strong>2) ดึง supplier</strong>
+            <button class="secondary copy-btn" data-target="codeSuppliers">Copy</button>
+          </div>
+          <pre id="codeSuppliers">async function getSuppliers() {
+  const res = await fetch(`${BASE_URL}/api/stock/suppliers/`);
+  if (!res.ok) throw new Error("Load suppliers failed");
+  return await res.json();
+}</pre>
+        </div>
+        <div class="snippet">
+          <div class="inline-actions">
+            <strong>3) สร้าง restock order</strong>
+            <button class="secondary copy-btn" data-target="codeCreateRestock">Copy</button>
+          </div>
+          <pre id="codeCreateRestock">async function createRestock(payload) {
+  const res = await fetch(`${BASE_URL}/api/stock/restocks/`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) throw new Error(await res.text());
+  return await res.json();
+}
+
+// payload example
+// {
+//   supplier: 1,
+//   employee: 1,
+//   location: 1,
+//   restock_date: "2026-04-10",
+//   restock_status: "Pending"
+// }</pre>
+        </div>
+        <div class="snippet">
+          <div class="inline-actions">
+            <strong>4) เพิ่มสินค้าเข้า restock</strong>
+            <button class="secondary copy-btn" data-target="codeAddDetail">Copy</button>
+          </div>
+          <pre id="codeAddDetail">async function addRestockDetail(payload) {
+  const res = await fetch(`${BASE_URL}/api/stock/restock-details/`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) throw new Error(await res.text());
+  return await res.json();
+}
+
+// payload example
+// {
+//   restock: 3,
+//   product: 12,
+//   quantity: 25
+// }</pre>
+        </div>
+        <div class="snippet">
+          <div class="inline-actions">
+            <strong>5) เปลี่ยนสถานะเป็น Received</strong>
+            <button class="secondary copy-btn" data-target="codePatchStatus">Copy</button>
+          </div>
+          <pre id="codePatchStatus">async function markRestockReceived(restockId) {
+  const res = await fetch(`${BASE_URL}/api/stock/restocks/${restockId}/`, {
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ restock_status: "Received" }),
+  });
+  if (!res.ok) throw new Error(await res.text());
+  return await res.json();
+}</pre>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="section-head">
+          <div>
+            <h2>Flow ที่หน้าเว็บนี้ใช้</h2>
+            <div class="muted">ยึดตามสิ่งที่ backend ปัจจุบันเปิดให้ใช้ได้จริง</div>
+          </div>
+        </div>
+        <div class="detail-list">
+          <div class="detail-item"><strong>Step 1:</strong> โหลด master data ได้แก่ products, categories, suppliers,
+            employees, locations และ restocks</div>
+          <div class="detail-item"><strong>Step 2:</strong> แอดมินเลือก supplier / employee / location เพื่อสร้าง
+            restock order</div>
+          <div class="detail-item"><strong>Step 3:</strong> แอดมินเพิ่มสินค้าแต่ละตัวด้วย endpoint
+            <code>restock-details</code></div>
+          <div class="detail-item"><strong>Step 4:</strong> เมื่อของเข้าจริง ให้เปลี่ยนสถานะเป็น <code>Received</code>
+          </div>
+          <div class="detail-item"><strong>Step 5:</strong> ฝั่ง Django จะเพิ่ม <code>stock_quantity</code> ของสินค้าใน
+            order ให้อัตโนมัติ</div>
+        </div>
+        <div style="height: 18px;"></div>
+        <div class="warning">
+          ตอนนี้หน้าเว็บนี้ยังไม่ได้ทำ CRUD สินค้าโดยตรง เพราะ <code>ProductViewSet</code> ใน repo ปัจจุบันเป็น
+          <code>ReadOnlyModelViewSet</code>. ถ้าจะทำหน้า “จัดการสินค้าเต็มรูปแบบ” จริง ๆ ต้องเปลี่ยนฝั่ง backend ก่อน.
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const state = {
+      products: [],
+      categories: [],
+      suppliers: [],
+      locations: [],
+      employees: [],
+      restocks: [],
+    };
+
+    const els = {
+      baseUrl: document.getElementById('baseUrl'),
+      statusBox: document.getElementById('statusBox'),
+      metricProducts: document.getElementById('metricProducts'),
+      metricStock: document.getElementById('metricStock'),
+      metricLocations: document.getElementById('metricLocations'),
+      metricSuppliers: document.getElementById('metricSuppliers'),
+      metricPending: document.getElementById('metricPending'),
+      productsBody: document.getElementById('productsBody'),
+      suppliersBody: document.getElementById('suppliersBody'),
+      restocksBody: document.getElementById('restocksBody'),
+      productSearch: document.getElementById('productSearch'),
+      supplierSearch: document.getElementById('supplierSearch'),
+      categoryFilter: document.getElementById('categoryFilter'),
+      locationFilter: document.getElementById('locationFilter'),
+      stockFilter: document.getElementById('stockFilter'),
+      supplierSelect: document.getElementById('supplierSelect'),
+      employeeSelect: document.getElementById('employeeSelect'),
+      locationSelect: document.getElementById('locationSelect'),
+      detailRestockSelect: document.getElementById('detailRestockSelect'),
+      detailProductSelect: document.getElementById('detailProductSelect'),
+      restockDate: document.getElementById('restockDate'),
+      restockStatus: document.getElementById('restockStatus'),
+      detailQty: document.getElementById('detailQty'),
+      restockForm: document.getElementById('restockForm'),
+      detailForm: document.getElementById('detailForm'),
+      loadAllBtn: document.getElementById('loadAllBtn'),
+      refreshBtn: document.getElementById('refreshBtn'),
+      fillDemoBtn: document.getElementById('fillDemoBtn'),
+    };
+
+    const currency = new Intl.NumberFormat('th-TH', { style: 'currency', currency: 'THB' });
+
+    function baseUrl() {
+      return els.baseUrl.value.trim().replace(/\/$/, '');
+    }
+
+    function endpoint(path) {
+      return `${baseUrl()}${path}`;
+    }
+
+    function unwrap(data) {
+      return Array.isArray(data) ? data : (data.results || []);
+    }
+
+    function setStatus(message, type = '') {
+      els.statusBox.textContent = message;
+      els.statusBox.className = 'status-box' + (type ? ` ${type}` : '');
+    }
+
+    async function request(path, options = {}) {
+      const res = await fetch(endpoint(path), {
+        headers: {
+          'Content-Type': 'application/json',
+          ...(options.headers || {}),
+        },
+        ...options,
+      });
+
+      const text = await res.text();
+      let data = text;
+      try { data = text ? JSON.parse(text) : null; } catch (_) { }
+
+      if (!res.ok) {
+        const detail = typeof data === 'string' ? data : JSON.stringify(data, null, 2);
+        throw new Error(`${res.status} ${res.statusText}\n${detail}`);
+      }
+
+      return data;
+    }
+
+    // ==== API functions: ส่วนนี้ก็อปไปใช้ต่อในฟร้อนอื่นได้เลย ====
+    const api = {
+      getProducts: () => request('/api/catalog/products/'),
+      getCategories: () => request('/api/catalog/categories/'),
+      getSuppliers: () => request('/api/stock/suppliers/'),
+      getLocations: () => request('/api/stock/locations/'),
+      getRestocks: () => request('/api/stock/restocks/'),
+      getEmployees: () => request('/api/accounts/employees/'),
+      createRestock: (payload) => request('/api/stock/restocks/', { method: 'POST', body: JSON.stringify(payload) }),
+      addRestockDetail: (payload) => request('/api/stock/restock-details/', { method: 'POST', body: JSON.stringify(payload) }),
+      updateRestock: (restockId, payload) => request(`/api/stock/restocks/${restockId}/`, { method: 'PATCH', body: JSON.stringify(payload) }),
+    };
+
+    window.inventoryApi = api;
+
+    function formatLocation(loc) {
+      const warehouseName = loc.warehouse_name ? `${loc.warehouse_name} - ` : '';
+      return `${warehouseName}${loc.zone}/${loc.aisle}/${loc.bin}`;
+    }
+
+    function locationNameById(locationId) {
+      const loc = state.locations.find(item => Number(item.location_id) === Number(locationId));
+      return loc ? formatLocation(loc) : '-';
+    }
+
+    function categoryNameById(categoryId) {
+      const cat = state.categories.find(item => Number(item.category_id) === Number(categoryId));
+      return cat ? cat.category_name : '-';
+    }
+
+    function statusBadge(status) {
+      const normalized = String(status || '').toLowerCase();
+      let cls = '';
+      if (normalized === 'pending') cls = 'pending';
+      else if (normalized === 'in transit') cls = 'transit';
+      else if (normalized === 'received') cls = 'received';
+      else if (normalized === 'rejected') cls = 'rejected';
+      return `<span class="badge ${cls}">${escapeHtml(status || '-')}</span>`;
+    }
+
+    function escapeHtml(value) {
+      return String(value ?? '')
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
+
+    function updateMetrics() {
+      const totalStock = state.products.reduce((sum, item) => sum + Number(item.stock_quantity || 0), 0);
+      const pendingCount = state.restocks.filter(item => String(item.restock_status).toLowerCase() !== 'received').length;
+      els.metricProducts.textContent = state.products.length;
+      els.metricStock.textContent = totalStock.toLocaleString('th-TH');
+      els.metricLocations.textContent = state.locations.length;
+      els.metricSuppliers.textContent = state.suppliers.length;
+      els.metricPending.textContent = pendingCount;
+    }
+
+    function renderProductFilters() {
+      const currentCategory = els.categoryFilter.value;
+      const currentLocation = els.locationFilter.value;
+
+      els.categoryFilter.innerHTML = '<option value="">ทั้งหมด</option>' +
+        state.categories.map(cat => `<option value="${cat.category_id}">${escapeHtml(cat.category_name)}</option>`).join('');
+
+      els.locationFilter.innerHTML = '<option value="">ทั้งหมด</option>' +
+        state.locations.map(loc => `<option value="${loc.location_id}">${escapeHtml(formatLocation(loc))}</option>`).join('');
+
+      els.categoryFilter.value = currentCategory;
+      els.locationFilter.value = currentLocation;
+    }
+
+    function renderSupplierTable() {
+      const q = els.supplierSearch.value.trim().toLowerCase();
+
+      const rows = state.suppliers.filter(item => {
+        const haystack = [
+          item.company_name,
+          item.contact_person,
+          item.phone_num,
+          item.address,
+          item.supplier_id,
+        ].map(value => String(value || '').toLowerCase()).join(' ');
+
+        return !q || haystack.includes(q);
+      }).map(item => `
+          <tr>
+            <td class="nowrap">#${item.supplier_id}</td>
+            <td><strong>${escapeHtml(item.company_name || '-')}</strong></td>
+            <td>${escapeHtml(item.contact_person || '-')}</td>
+            <td>${escapeHtml(item.phone_num || '-')}</td>
+            <td>${escapeHtml(item.address || '-')}</td>
+          </tr>
+      `).join('');
+
+      els.suppliersBody.innerHTML = rows || '<tr><td colspan="5" class="muted">ไม่พบข้อมูล supplier</td></tr>';
+    }
+
+    function renderProductTable() {
+      const q = els.productSearch.value.trim().toLowerCase();
+      const categoryId = els.categoryFilter.value;
+      const locationId = els.locationFilter.value;
+      const stockMode = els.stockFilter.value;
+
+      const rows = state.products.filter(item => {
+        const name = String(item.product_name || '').toLowerCase();
+        const color = String(item.color || '').toLowerCase();
+        const categoryName = String(item.category_name || categoryNameById(item.category) || '').toLowerCase();
+        const locationName = String(locationNameById(item.location) || '').toLowerCase();
+        const stock = Number(item.stock_quantity || 0);
+
+        const matchesQuery = !q || [name, color, categoryName, locationName].some(text => text.includes(q));
+        const matchesCategory = !categoryId || String(item.category) === String(categoryId);
+        const matchesLocation = !locationId || String(item.location) === String(locationId);
+        const matchesStock = !stockMode ||
+          (stockMode === 'low' && stock <= 10) ||
+          (stockMode === 'out' && stock === 0) ||
+          (stockMode === 'ok' && stock > 10);
+
+        return matchesQuery && matchesCategory && matchesLocation && matchesStock;
+      }).map(item => {
+        const stock = Number(item.stock_quantity || 0);
+        const stockChip = stock === 0
+          ? '<span class="badge rejected">Out</span>'
+          : stock <= 10
+            ? '<span class="badge pending">Low</span>'
+            : '<span class="badge received">OK</span>';
+
+        return `
+          <tr>
+            <td class="nowrap">#${item.product_id}</td>
+            <td><strong>${escapeHtml(item.product_name)}</strong></td>
+            <td>${escapeHtml(item.category_name || categoryNameById(item.category))}</td>
+            <td>${escapeHtml(locationNameById(item.location))}</td>
+            <td>${escapeHtml(item.color || '-')}</td>
+            <td>${escapeHtml(`${item.width}×${item.length}×${item.height}`)}</td>
+            <td class="right">${escapeHtml(currency.format(Number(item.price || 0)))}</td>
+            <td class="right">
+              <div>${stock.toLocaleString('th-TH')}</div>
+              <div style="margin-top: 6px;">${stockChip}</div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      els.productsBody.innerHTML = rows || '<tr><td colspan="8" class="muted">ไม่พบข้อมูลสินค้า</td></tr>';
+    }
+
+    function fillSelect(selectEl, items, valueKey, labelFn, placeholder) {
+      selectEl.innerHTML = `<option value="">${placeholder}</option>` +
+        items.map(item => `<option value="${item[valueKey]}">${escapeHtml(labelFn(item))}</option>`).join('');
+    }
+
+    function renderFormOptions() {
+      fillSelect(els.supplierSelect, state.suppliers, 'supplier_id', item => `${item.company_name} (#${item.supplier_id})`, 'เลือก supplier');
+      fillSelect(els.employeeSelect, state.employees, 'employee_id', item => `${item.full_name} (${item.role})`, 'เลือก employee');
+      fillSelect(els.locationSelect, state.locations, 'location_id', item => `${formatLocation(item)} (#${item.location_id})`, 'เลือก location');
+      fillSelect(els.detailProductSelect, state.products, 'product_id', item => `${item.product_name} | stock ${item.stock_quantity}`, 'เลือก product');
+      fillSelect(els.detailRestockSelect, state.restocks, 'restock_id', item => `#${item.restock_id} | ${item.supplier_name} | ${item.restock_status}`, 'เลือก restock');
+    }
+
+    function renderRestockTable() {
+      const rows = [...state.restocks]
+        .sort((a, b) => Number(b.restock_id) - Number(a.restock_id))
+        .map(item => {
+          const detailsHtml = (item.details || []).length
+            ? item.details.map(detail => `
+                <div class="detail-item">
+                  <strong>${escapeHtml(detail.product_name || `Product #${detail.product}`)}</strong><br>
+                  Qty: ${escapeHtml(detail.quantity)}
+                </div>
+              `).join('')
+            : '<span class="muted">ยังไม่มีรายการสินค้าใน order นี้</span>';
+
+          return `
+            <tr>
+              <td class="nowrap">#${item.restock_id}</td>
+              <td>${escapeHtml(item.restock_date || '-')}</td>
+              <td>${escapeHtml(item.supplier_name || '-')}</td>
+              <td>${escapeHtml(item.employee_name || '-')}</td>
+              <td>${escapeHtml(item.location_name || locationNameById(item.location))}</td>
+              <td>${statusBadge(item.restock_status)}</td>
+              <td><div class="detail-list">${detailsHtml}</div></td>
+              <td>
+                <div class="inline-actions">
+                  <select id="status-select-${item.restock_id}">
+                    ${['Pending', 'In transit', 'Received', 'Rejected'].map(status => `
+                      <option value="${status}" ${status === item.restock_status ? 'selected' : ''}>${status}</option>
+                    `).join('')}
+                  </select>
+                  <button class="secondary" onclick="changeRestockStatus(${item.restock_id})">อัปเดต</button>
+                </div>
+              </td>
+            </tr>
+          `;
+        }).join('');
+
+      els.restocksBody.innerHTML = rows || '<tr><td colspan="8" class="muted">ยังไม่มี restock order</td></tr>';
+    }
+
+    async function loadAllData() {
+      setStatus('กำลังโหลดข้อมูลทั้งหมด...');
+      try {
+        const [products, categories, suppliers, locations, employees, restocks] = await Promise.all([
+          api.getProducts(),
+          api.getCategories(),
+          api.getSuppliers(),
+          api.getLocations(),
+          api.getEmployees(),
+          api.getRestocks(),
+        ]);
+
+        state.products = unwrap(products);
+        state.categories = unwrap(categories);
+        state.suppliers = unwrap(suppliers);
+        state.locations = unwrap(locations);
+        state.employees = unwrap(employees);
+        state.restocks = unwrap(restocks);
+
+        updateMetrics();
+        renderProductFilters();
+        renderProductTable();
+        renderSupplierTable();
+        renderFormOptions();
+        renderRestockTable();
+
+        setStatus('โหลดข้อมูลสำเร็จ', 'ok');
+      } catch (error) {
+        console.error(error);
+        setStatus(`โหลดข้อมูลไม่สำเร็จ\n${error.message}`, 'error');
+      }
+    }
+
+    async function handleCreateRestock(event) {
+      event.preventDefault();
+      try {
+        const payload = {
+          supplier: Number(els.supplierSelect.value),
+          employee: Number(els.employeeSelect.value),
+          location: Number(els.locationSelect.value),
+          restock_date: els.restockDate.value,
+          restock_status: els.restockStatus.value,
+        };
+
+        setStatus('กำลังสร้าง restock order...');
+        const created = await api.createRestock(payload);
+        setStatus(`สร้าง restock order สำเร็จ: #${created.restock_id}`, 'ok');
+        els.restockForm.reset();
+        els.restockDate.value = new Date().toISOString().slice(0, 10);
+        els.restockStatus.value = 'Pending';
+        await loadAllData();
+        if (created.restock_id) {
+          els.detailRestockSelect.value = String(created.restock_id);
+        }
+      } catch (error) {
+        console.error(error);
+        setStatus(`สร้าง restock order ไม่สำเร็จ\n${error.message}`, 'error');
+      }
+    }
+
+    async function handleCreateDetail(event) {
+      event.preventDefault();
+      try {
+        const payload = {
+          restock: Number(els.detailRestockSelect.value),
+          product: Number(els.detailProductSelect.value),
+          quantity: Number(els.detailQty.value),
+        };
+        setStatus('กำลังเพิ่มสินค้าเข้า restock...');
+        const created = await api.addRestockDetail(payload);
+        setStatus(`เพิ่มสินค้าเข้า restock สำเร็จ: detail #${created.restock_detail_id}`, 'ok');
+        els.detailForm.reset();
+        els.detailQty.value = 1;
+        await loadAllData();
+      } catch (error) {
+        console.error(error);
+        setStatus(`เพิ่มสินค้าเข้า restock ไม่สำเร็จ\n${error.message}`, 'error');
+      }
+    }
+
+    async function changeRestockStatus(restockId) {
+      const select = document.getElementById(`status-select-${restockId}`);
+      const restockStatus = select.value;
+      try {
+        setStatus(`กำลังอัปเดตสถานะ restock #${restockId} เป็น ${restockStatus}...`);
+        await api.updateRestock(restockId, { restock_status: restockStatus });
+        setStatus(`อัปเดต restock #${restockId} สำเร็จ`, 'ok');
+        await loadAllData();
+      } catch (error) {
+        console.error(error);
+        setStatus(`อัปเดตสถานะไม่สำเร็จ\n${error.message}`, 'error');
+      }
+    }
+
+    window.changeRestockStatus = changeRestockStatus;
+
+    function wireCopyButtons() {
+      document.querySelectorAll('.copy-btn').forEach(button => {
+        button.addEventListener('click', async () => {
+          const targetId = button.getAttribute('data-target');
+          const content = document.getElementById(targetId)?.textContent || '';
+          try {
+            await navigator.clipboard.writeText(content);
+            setStatus('คัดลอก snippet แล้ว', 'ok');
+          } catch (error) {
+            setStatus('คัดลอกไม่สำเร็จ ลองก็อปเองจากหน้าจอ', 'error');
+          }
+        });
+      });
+    }
+
+    function fillDemoData() {
+      if (state.suppliers[0]) els.supplierSelect.value = state.suppliers[0].supplier_id;
+      if (state.employees[0]) els.employeeSelect.value = state.employees[0].employee_id;
+      if (state.locations[0]) els.locationSelect.value = state.locations[0].location_id;
+      if (state.restocks[0]) els.detailRestockSelect.value = state.restocks[0].restock_id;
+      if (state.products[0]) els.detailProductSelect.value = state.products[0].product_id;
+      els.restockDate.value = new Date().toISOString().slice(0, 10);
+      els.restockStatus.value = 'Pending';
+      els.detailQty.value = 5;
+      setStatus('ใส่ข้อมูลตัวอย่างในฟอร์มแล้ว', 'ok');
+    }
+
+    function wireFilters() {
+      [els.productSearch, els.categoryFilter, els.locationFilter, els.stockFilter].forEach(el => {
+        el.addEventListener('input', renderProductTable);
+        el.addEventListener('change', renderProductTable);
+      });
+      [els.supplierSearch].forEach(el => {
+        el.addEventListener('input', renderSupplierTable);
+        el.addEventListener('change', renderSupplierTable);
+      });
+    }
+
+    function init() {
+      els.restockDate.value = new Date().toISOString().slice(0, 10);
+      els.loadAllBtn.addEventListener('click', loadAllData);
+      els.refreshBtn.addEventListener('click', loadAllData);
+      els.fillDemoBtn.addEventListener('click', fillDemoData);
+      els.restockForm.addEventListener('submit', handleCreateRestock);
+      els.detailForm.addEventListener('submit', handleCreateDetail);
+      wireFilters();
+      wireCopyButtons();
+      loadAllData();
+    }
+
+    init();
+  </script>
+</body>
+
+</html>
