@@ -183,6 +183,12 @@
       background: rgba(148, 163, 184, 0.08);
     }
 
+    button.danger {
+      background: rgba(239, 68, 68, 0.16);
+      border-color: rgba(239, 68, 68, 0.45);
+      color: #fecaca;
+    }
+
     .status-box,
     .warning {
       border-radius: 14px;
@@ -445,6 +451,141 @@
       </div>
     </section>
 
+
+    <section class="grid-2">
+      <div class="panel">
+        <div class="section-head">
+          <div>
+            <h2>Warehouse Directory</h2>
+            <div class="muted">ดูรายชื่อ warehouse และกด edit เพื่อโหลดเข้า form</div>
+          </div>
+        </div>
+        <div class="field-grid" style="margin-bottom: 14px;">
+          <div class="field full">
+            <label for="warehouseSearch">ค้นหา warehouse</label>
+            <input id="warehouseSearch" placeholder="name, phone, address" />
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Warehouse</th>
+                <th>Phone</th>
+                <th>Address</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="warehousesBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="section-head">
+          <div>
+            <h2>Create / Edit Warehouse</h2>
+            <div class="muted">หน้าเว็บนี้เตรียม POST / PATCH / DELETE ไว้แล้ว แต่ถ้า backend branch นี้ยัง read-only
+              ปุ่มบันทึกและลบจะโดน 405</div>
+          </div>
+        </div>
+        <form id="warehouseForm" class="field-grid">
+          <input id="warehouseId" type="hidden" />
+          <div class="field">
+            <label for="warehouseName">Warehouse Name</label>
+            <input id="warehouseName" required />
+          </div>
+          <div class="field">
+            <label for="warehousePhone">Phone</label>
+            <input id="warehousePhone" required />
+          </div>
+          <div class="field full">
+            <label for="warehouseAddress">Address</label>
+            <textarea id="warehouseAddress" required></textarea>
+          </div>
+          <div class="field full">
+            <div class="inline-actions">
+              <button class="primary" id="warehouseSubmitBtn" type="submit">สร้าง Warehouse</button>
+              <button class="secondary" id="warehouseCancelBtn" type="button">ล้างฟอร์ม</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <section class="grid-2">
+      <div class="panel">
+        <div class="section-head">
+          <div>
+            <h2>Warehouse Locations</h2>
+            <div class="muted">ดูตำแหน่งเก็บของในคลัง พร้อมค้นหาและ filter ตาม warehouse</div>
+          </div>
+        </div>
+        <div class="field-grid" style="margin-bottom: 14px;">
+          <div class="field">
+            <label for="locationSearch">ค้นหา location</label>
+            <input id="locationSearch" placeholder="warehouse, zone, aisle, bin" />
+          </div>
+          <div class="field">
+            <label for="warehouseFilterForLocation">Warehouse</label>
+            <select id="warehouseFilterForLocation">
+              <option value="">ทั้งหมด</option>
+            </select>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Warehouse</th>
+                <th>Zone</th>
+                <th>Aisle</th>
+                <th>Bin</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="locationsTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="section-head">
+          <div>
+            <h2>Create / Edit Warehouse Location</h2>
+            <div class="muted">ใช้ field ตาม serializer คือ warehouse, aisle, zone, bin</div>
+          </div>
+        </div>
+        <form id="locationForm" class="field-grid">
+          <input id="locationId" type="hidden" />
+          <div class="field">
+            <label for="locationWarehouse">Warehouse</label>
+            <select id="locationWarehouse" required></select>
+          </div>
+          <div class="field">
+            <label for="locationZone">Zone</label>
+            <input id="locationZone" required />
+          </div>
+          <div class="field">
+            <label for="locationAisle">Aisle</label>
+            <input id="locationAisle" required />
+          </div>
+          <div class="field">
+            <label for="locationBin">Bin</label>
+            <input id="locationBin" required />
+          </div>
+          <div class="field full">
+            <div class="inline-actions">
+              <button class="primary" id="locationSubmitBtn" type="submit">สร้าง Warehouse Location</button>
+              <button class="secondary" id="locationCancelBtn" type="button">ล้างฟอร์ม</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </section>
+
     <section class="grid-2">
       <div class="panel">
         <div class="section-head">
@@ -505,7 +646,8 @@
           <div>
             <h2>Create / Edit Product</h2>
             <div class="muted">POST <code>/api/catalog/products/</code> และ PATCH
-              <code>/api/catalog/products/{id}/</code></div>
+              <code>/api/catalog/products/{id}/</code>
+            </div>
           </div>
         </div>
         <form id="productForm" class="field-grid">
@@ -732,11 +874,13 @@
         </div>
         <div class="detail-list">
           <div class="detail-item"><strong>Step 1:</strong> โหลด master data: products, categories, suppliers,
-            employees, locations, restocks</div>
+            warehouses, warehouse locations, employees, restocks</div>
           <div class="detail-item"><strong>Step 2:</strong> สร้างหรือแก้ supplier ได้จาก form ข้างตาราง</div>
-          <div class="detail-item"><strong>Step 3:</strong> สร้างหรือแก้ product ได้จาก form ข้างตาราง inventory</div>
-          <div class="detail-item"><strong>Step 4:</strong> สร้าง restock order แล้วเพิ่มสินค้าเข้า order</div>
-          <div class="detail-item"><strong>Step 5:</strong> เปลี่ยน status เป็น <code>Received</code> เพื่อให้ stock
+          <div class="detail-item"><strong>Step 3:</strong> เตรียมหน้า warehouse และ warehouse location ให้กด edit /
+            delete ได้ในไฟล์เดียว</div>
+          <div class="detail-item"><strong>Step 4:</strong> สร้างหรือแก้ product ได้จาก form ข้างตาราง inventory</div>
+          <div class="detail-item"><strong>Step 5:</strong> สร้าง restock order แล้วเพิ่มสินค้าเข้า order</div>
+          <div class="detail-item"><strong>Step 6:</strong> เปลี่ยน status เป็น <code>Received</code> เพื่อให้ stock
             เพิ่มอัตโนมัติ</div>
         </div>
         <div style="height: 16px;"></div>
@@ -753,6 +897,7 @@
       products: [],
       categories: [],
       suppliers: [],
+      warehouses: [],
       locations: [],
       employees: [],
       restocks: [],
@@ -776,6 +921,28 @@
       supplierAddress: document.getElementById('supplierAddress'),
       supplierSubmitBtn: document.getElementById('supplierSubmitBtn'),
       supplierCancelBtn: document.getElementById('supplierCancelBtn'),
+
+      warehouseSearch: document.getElementById('warehouseSearch'),
+      warehousesBody: document.getElementById('warehousesBody'),
+      warehouseForm: document.getElementById('warehouseForm'),
+      warehouseId: document.getElementById('warehouseId'),
+      warehouseName: document.getElementById('warehouseName'),
+      warehousePhone: document.getElementById('warehousePhone'),
+      warehouseAddress: document.getElementById('warehouseAddress'),
+      warehouseSubmitBtn: document.getElementById('warehouseSubmitBtn'),
+      warehouseCancelBtn: document.getElementById('warehouseCancelBtn'),
+
+      locationSearch: document.getElementById('locationSearch'),
+      warehouseFilterForLocation: document.getElementById('warehouseFilterForLocation'),
+      locationsTableBody: document.getElementById('locationsTableBody'),
+      locationForm: document.getElementById('locationForm'),
+      locationId: document.getElementById('locationId'),
+      locationWarehouse: document.getElementById('locationWarehouse'),
+      locationAisle: document.getElementById('locationAisle'),
+      locationZone: document.getElementById('locationZone'),
+      locationBin: document.getElementById('locationBin'),
+      locationSubmitBtn: document.getElementById('locationSubmitBtn'),
+      locationCancelBtn: document.getElementById('locationCancelBtn'),
 
       productSearch: document.getElementById('productSearch'),
       categoryFilter: document.getElementById('categoryFilter'),
@@ -864,8 +1031,17 @@
       getSuppliers: () => request('/api/stock/suppliers/'),
       createSupplier: (payload) => request('/api/stock/suppliers/', { method: 'POST', body: JSON.stringify(payload) }),
       updateSupplier: (supplierId, payload) => request(`/api/stock/suppliers/${supplierId}/`, { method: 'PATCH', body: JSON.stringify(payload) }),
+      deleteSupplier: (supplierId) => request(`/api/stock/suppliers/${supplierId}/`, { method: 'DELETE' }),
+
+      getWarehouses: () => request('/api/stock/warehouses/'),
+      createWarehouse: (payload) => request('/api/stock/warehouses/', { method: 'POST', body: JSON.stringify(payload) }),
+      updateWarehouse: (warehouseId, payload) => request(`/api/stock/warehouses/${warehouseId}/`, { method: 'PATCH', body: JSON.stringify(payload) }),
+      deleteWarehouse: (warehouseId) => request(`/api/stock/warehouses/${warehouseId}/`, { method: 'DELETE' }),
 
       getLocations: () => request('/api/stock/locations/'),
+      createLocation: (payload) => request('/api/stock/locations/', { method: 'POST', body: JSON.stringify(payload) }),
+      updateLocation: (locationId, payload) => request(`/api/stock/locations/${locationId}/`, { method: 'PATCH', body: JSON.stringify(payload) }),
+      deleteLocation: (locationId) => request(`/api/stock/locations/${locationId}/`, { method: 'DELETE' }),
       getRestocks: () => request('/api/stock/restocks/'),
       getEmployees: () => request('/api/accounts/employees/'),
       createRestock: (payload) => request('/api/stock/restocks/', { method: 'POST', body: JSON.stringify(payload) }),
@@ -898,6 +1074,11 @@
       if (!loc) return '-';
       const warehouse = loc.warehouse_name ? `${loc.warehouse_name} - ` : '';
       return `${warehouse}${loc.zone}/${loc.aisle}/${loc.bin}`;
+    }
+
+    function warehouseNameById(warehouseId) {
+      const item = state.warehouses.find(warehouse => String(warehouse.warehouse_id) === String(warehouseId));
+      return item ? item.wname : '-';
     }
 
     function locationNameById(locationId) {
@@ -943,6 +1124,12 @@
       fillSelect(els.locationSelect, state.locations, 'location_id', item => `${formatLocation(item)} (#${item.location_id})`, 'เลือก location');
       fillSelect(els.detailProductSelect, state.products, 'product_id', item => `${item.product_name} | stock ${item.stock_quantity}`, 'เลือก product');
       fillSelect(els.detailRestockSelect, state.restocks, 'restock_id', item => `#${item.restock_id} | ${item.supplier_name || item.supplier} | ${item.restock_status}`, 'เลือก restock');
+      fillSelect(els.locationWarehouse, state.warehouses, 'warehouse_id', item => `${item.wname} (#${item.warehouse_id})`, 'เลือก warehouse');
+
+      const currentWarehouseFilter = els.warehouseFilterForLocation.value;
+      els.warehouseFilterForLocation.innerHTML = '<option value="">ทั้งหมด</option>' +
+        state.warehouses.map(item => `<option value="${item.warehouse_id}">${escapeHtml(item.wname)}</option>`).join('');
+      els.warehouseFilterForLocation.value = currentWarehouseFilter;
     }
 
     function renderSupplierTable() {
@@ -960,10 +1147,70 @@
             <td>${escapeHtml(item.contact_person || '-')}</td>
             <td>${escapeHtml(item.phone_num || '-')}</td>
             <td>${escapeHtml(item.address || '-')}</td>
-            <td><button class="secondary" onclick="editSupplier(${item.supplier_id})">Edit</button></td>
+            <td>
+              <div class="inline-actions">
+                <button class="secondary" onclick="editSupplier(${item.supplier_id})">Edit</button>
+                <button class="danger" onclick="deleteSupplier(${item.supplier_id}, '${escapeHtml(item.company_name || '')}')">Delete</button>
+              </div>
+            </td>
           </tr>
         `).join('');
       els.suppliersBody.innerHTML = rows || '<tr><td colspan="6" class="muted">ไม่พบข้อมูล supplier</td></tr>';
+    }
+
+
+    function renderWarehouseTable() {
+      const q = els.warehouseSearch.value.trim().toLowerCase();
+      const rows = state.warehouses
+        .filter(item => {
+          const haystack = [item.warehouse_id, item.wname, item.wphone, item.waddress]
+            .map(v => String(v || '').toLowerCase()).join(' ');
+          return !q || haystack.includes(q);
+        })
+        .map(item => `
+          <tr>
+            <td class="nowrap">#${item.warehouse_id}</td>
+            <td><strong>${escapeHtml(item.wname || '-')}</strong></td>
+            <td>${escapeHtml(item.wphone || '-')}</td>
+            <td>${escapeHtml(item.waddress || '-')}</td>
+            <td>
+              <div class="inline-actions">
+                <button class="secondary" onclick="editWarehouse(${item.warehouse_id})">Edit</button>
+                <button class="danger" onclick="deleteWarehouse(${item.warehouse_id}, '${escapeHtml(item.wname || '')}')">Delete</button>
+              </div>
+            </td>
+          </tr>
+        `).join('');
+      els.warehousesBody.innerHTML = rows || '<tr><td colspan="5" class="muted">ไม่พบข้อมูล warehouse</td></tr>';
+    }
+
+    function renderLocationTable() {
+      const q = els.locationSearch.value.trim().toLowerCase();
+      const warehouseId = els.warehouseFilterForLocation.value;
+      const rows = state.locations
+        .filter(item => {
+          const haystack = [item.location_id, item.warehouse_name, warehouseNameById(item.warehouse), item.aisle, item.zone, item.bin]
+            .map(v => String(v || '').toLowerCase()).join(' ');
+          const matchesQuery = !q || haystack.includes(q);
+          const matchesWarehouse = !warehouseId || String(item.warehouse) === String(warehouseId);
+          return matchesQuery && matchesWarehouse;
+        })
+        .map(item => `
+          <tr>
+            <td class="nowrap">#${item.location_id}</td>
+            <td>${escapeHtml(item.warehouse_name || warehouseNameById(item.warehouse))}</td>
+            <td>${escapeHtml(item.zone || '-')}</td>
+            <td>${escapeHtml(item.aisle || '-')}</td>
+            <td>${escapeHtml(item.bin || '-')}</td>
+            <td>
+              <div class="inline-actions">
+                <button class="secondary" onclick="editLocation(${item.location_id})">Edit</button>
+                <button class="danger" onclick="deleteLocation(${item.location_id}, '${escapeHtml(item.warehouse_name || warehouseNameById(item.warehouse) || '')}')">Delete</button>
+              </div>
+            </td>
+          </tr>
+        `).join('');
+      els.locationsTableBody.innerHTML = rows || '<tr><td colspan="6" class="muted">ไม่พบข้อมูล warehouse location</td></tr>';
     }
 
     function renderProductTable() {
@@ -1060,6 +1307,19 @@
       els.supplierSubmitBtn.textContent = 'สร้าง Supplier';
     }
 
+    function resetWarehouseForm() {
+      els.warehouseForm.reset();
+      els.warehouseId.value = '';
+      els.warehouseSubmitBtn.textContent = 'สร้าง Warehouse';
+    }
+
+    function resetLocationForm() {
+      els.locationForm.reset();
+      els.locationId.value = '';
+      els.locationSubmitBtn.textContent = 'สร้าง Warehouse Location';
+      if (state.warehouses[0]) els.locationWarehouse.value = state.warehouses[0].warehouse_id;
+    }
+
     function resetProductForm() {
       els.productForm.reset();
       els.productId.value = '';
@@ -1080,6 +1340,91 @@
       els.supplierSubmitBtn.textContent = `บันทึก Supplier #${item.supplier_id}`;
       setStatus(`โหลด supplier #${item.supplier_id} เข้า form แล้ว`, 'ok');
       window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    async function deleteSupplier(supplierId, companyName = '') {
+      const confirmed = confirm(`ต้องการลบ supplier #${supplierId}${companyName ? ` (${companyName})` : ''} ใช่ไหม?`);
+      if (!confirmed) return;
+
+      try {
+        setStatus(`กำลังลบ supplier #${supplierId}...`);
+        await api.deleteSupplier(Number(supplierId));
+
+        if (String(els.supplierId.value) === String(supplierId)) {
+          resetSupplierForm();
+        }
+
+        await loadAllData();
+        setStatus(`ลบ supplier #${supplierId} สำเร็จ`, 'ok');
+      } catch (error) {
+        console.error(error);
+        setStatus(`ลบ supplier ไม่สำเร็จ\n${error.message}`, 'error');
+      }
+    }
+
+    function editWarehouse(warehouseId) {
+      const item = state.warehouses.find(warehouse => String(warehouse.warehouse_id) === String(warehouseId));
+      if (!item) return;
+      els.warehouseId.value = item.warehouse_id;
+      els.warehouseName.value = item.wname || '';
+      els.warehousePhone.value = item.wphone || '';
+      els.warehouseAddress.value = item.waddress || '';
+      els.warehouseSubmitBtn.textContent = `บันทึก Warehouse #${item.warehouse_id}`;
+      setStatus(`โหลด warehouse #${item.warehouse_id} เข้า form แล้ว`, 'ok');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    async function deleteWarehouse(warehouseId, warehouseName = '') {
+      const confirmed = confirm(`ต้องการลบ warehouse #${warehouseId}${warehouseName ? ` (${warehouseName})` : ''} ใช่ไหม?`);
+      if (!confirmed) return;
+
+      try {
+        setStatus(`กำลังลบ warehouse #${warehouseId}...`);
+        await api.deleteWarehouse(Number(warehouseId));
+
+        if (String(els.warehouseId.value) === String(warehouseId)) {
+          resetWarehouseForm();
+        }
+
+        await loadAllData();
+        setStatus(`ลบ warehouse #${warehouseId} สำเร็จ`, 'ok');
+      } catch (error) {
+        console.error(error);
+        setStatus(`ลบ warehouse ไม่สำเร็จ\n${error.message}`, 'error');
+      }
+    }
+
+    function editLocation(locationId) {
+      const item = state.locations.find(location => String(location.location_id) === String(locationId));
+      if (!item) return;
+      els.locationId.value = item.location_id;
+      els.locationWarehouse.value = item.warehouse ?? '';
+      els.locationAisle.value = item.aisle || '';
+      els.locationZone.value = item.zone || '';
+      els.locationBin.value = item.bin || '';
+      els.locationSubmitBtn.textContent = `บันทึก Warehouse Location #${item.location_id}`;
+      setStatus(`โหลด warehouse location #${item.location_id} เข้า form แล้ว`, 'ok');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    async function deleteLocation(locationId, warehouseName = '') {
+      const confirmed = confirm(`ต้องการลบ warehouse location #${locationId}${warehouseName ? ` (${warehouseName})` : ''} ใช่ไหม?`);
+      if (!confirmed) return;
+
+      try {
+        setStatus(`กำลังลบ warehouse location #${locationId}...`);
+        await api.deleteLocation(Number(locationId));
+
+        if (String(els.locationId.value) === String(locationId)) {
+          resetLocationForm();
+        }
+
+        await loadAllData();
+        setStatus(`ลบ warehouse location #${locationId} สำเร็จ`, 'ok');
+      } catch (error) {
+        console.error(error);
+        setStatus(`ลบ warehouse location ไม่สำเร็จ\n${error.message}`, 'error');
+      }
     }
 
     function editProduct(productId) {
@@ -1103,10 +1448,11 @@
     async function loadAllData() {
       setStatus('กำลังโหลดข้อมูลทั้งหมด...');
       try {
-        const [products, categories, suppliers, locations, employees, restocks] = await Promise.all([
+        const [products, categories, suppliers, warehouses, locations, employees, restocks] = await Promise.all([
           api.getProducts(),
           api.getCategories(),
           api.getSuppliers(),
+          api.getWarehouses(),
           api.getLocations(),
           api.getEmployees(),
           api.getRestocks(),
@@ -1115,6 +1461,7 @@
         state.products = unwrap(products);
         state.categories = unwrap(categories);
         state.suppliers = unwrap(suppliers);
+        state.warehouses = unwrap(warehouses);
         state.locations = unwrap(locations);
         state.employees = unwrap(employees);
         state.restocks = unwrap(restocks);
@@ -1123,6 +1470,8 @@
         renderFilterOptions();
         renderFormOptions();
         renderSupplierTable();
+        renderWarehouseTable();
+        renderLocationTable();
         renderProductTable();
         renderRestockTable();
 
@@ -1158,6 +1507,61 @@
       } catch (error) {
         console.error(error);
         setStatus(`บันทึก supplier ไม่สำเร็จ\n${error.message}`, 'error');
+      }
+    }
+
+    async function handleSubmitWarehouse(event) {
+      event.preventDefault();
+      const payload = {
+        wname: els.warehouseName.value.trim(),
+        wphone: els.warehousePhone.value.trim(),
+        waddress: els.warehouseAddress.value.trim(),
+      };
+      const warehouseId = els.warehouseId.value;
+
+      try {
+        if (warehouseId) {
+          setStatus(`กำลังอัปเดต warehouse #${warehouseId}...`);
+          await api.updateWarehouse(Number(warehouseId), payload);
+          setStatus(`อัปเดต warehouse #${warehouseId} สำเร็จ`, 'ok');
+        } else {
+          setStatus('กำลังสร้าง warehouse...');
+          const created = await api.createWarehouse(payload);
+          setStatus(`สร้าง warehouse สำเร็จ: #${created.warehouse_id}`, 'ok');
+        }
+        resetWarehouseForm();
+        await loadAllData();
+      } catch (error) {
+        console.error(error);
+        setStatus(`บันทึก warehouse ไม่สำเร็จ\n${error.message}`, 'error');
+      }
+    }
+
+    async function handleSubmitLocation(event) {
+      event.preventDefault();
+      const payload = {
+        warehouse: Number(els.locationWarehouse.value),
+        aisle: els.locationAisle.value.trim(),
+        zone: els.locationZone.value.trim(),
+        bin: els.locationBin.value.trim(),
+      };
+      const locationId = els.locationId.value;
+
+      try {
+        if (locationId) {
+          setStatus(`กำลังอัปเดต warehouse location #${locationId}...`);
+          await api.updateLocation(Number(locationId), payload);
+          setStatus(`อัปเดต warehouse location #${locationId} สำเร็จ`, 'ok');
+        } else {
+          setStatus('กำลังสร้าง warehouse location...');
+          const created = await api.createLocation(payload);
+          setStatus(`สร้าง warehouse location สำเร็จ: #${created.location_id}`, 'ok');
+        }
+        resetLocationForm();
+        await loadAllData();
+      } catch (error) {
+        console.error(error);
+        setStatus(`บันทึก warehouse location ไม่สำเร็จ\n${error.message}`, 'error');
       }
     }
 
@@ -1255,6 +1659,11 @@
     }
 
     window.editSupplier = editSupplier;
+    window.deleteSupplier = deleteSupplier;
+    window.editWarehouse = editWarehouse;
+    window.deleteWarehouse = deleteWarehouse;
+    window.editLocation = editLocation;
+    window.deleteLocation = deleteLocation;
     window.editProduct = editProduct;
     window.changeRestockStatus = changeRestockStatus;
 
@@ -1279,12 +1688,27 @@
         els.detailProductSelect.value = item.product_id;
       }
       if (state.categories[0]) els.productCategory.value = state.categories[0].category_id;
+      if (state.warehouses[0]) {
+        els.locationWarehouse.value = state.warehouses[0].warehouse_id;
+      }
       if (state.locations[0]) {
         els.locationSelect.value = state.locations[0].location_id;
         els.productLocation.value = state.locations[0].location_id;
       }
       if (state.employees[0]) els.employeeSelect.value = state.employees[0].employee_id;
       if (state.restocks[0]) els.detailRestockSelect.value = state.restocks[0].restock_id;
+      if (state.locations[0]) {
+        const item = state.locations[0];
+        els.locationAisle.value = item.aisle || '';
+        els.locationZone.value = item.zone || '';
+        els.locationBin.value = item.bin || '';
+      }
+      if (state.warehouses[0]) {
+        const item = state.warehouses[0];
+        els.warehouseName.value = item.wname || '';
+        els.warehousePhone.value = item.wphone || '';
+        els.warehouseAddress.value = item.waddress || '';
+      }
       els.restockDate.value = new Date().toISOString().slice(0, 10);
       els.restockStatus.value = 'Pending';
       els.detailQty.value = 5;
@@ -1298,6 +1722,12 @@
       });
       els.supplierSearch.addEventListener('input', renderSupplierTable);
       els.supplierSearch.addEventListener('change', renderSupplierTable);
+      els.warehouseSearch.addEventListener('input', renderWarehouseTable);
+      els.warehouseSearch.addEventListener('change', renderWarehouseTable);
+      els.locationSearch.addEventListener('input', renderLocationTable);
+      els.locationSearch.addEventListener('change', renderLocationTable);
+      els.warehouseFilterForLocation.addEventListener('input', renderLocationTable);
+      els.warehouseFilterForLocation.addEventListener('change', renderLocationTable);
     }
 
     function wireCopyButtons() {
@@ -1324,6 +1754,12 @@
       els.supplierForm.addEventListener('submit', handleSubmitSupplier);
       els.supplierCancelBtn.addEventListener('click', resetSupplierForm);
 
+      els.warehouseForm.addEventListener('submit', handleSubmitWarehouse);
+      els.warehouseCancelBtn.addEventListener('click', resetWarehouseForm);
+
+      els.locationForm.addEventListener('submit', handleSubmitLocation);
+      els.locationCancelBtn.addEventListener('click', resetLocationForm);
+
       els.productForm.addEventListener('submit', handleSubmitProduct);
       els.productCancelBtn.addEventListener('click', resetProductForm);
 
@@ -1333,6 +1769,8 @@
       wireFilters();
       wireCopyButtons();
       resetSupplierForm();
+      resetWarehouseForm();
+      resetLocationForm();
       resetProductForm();
       loadAllData();
     }

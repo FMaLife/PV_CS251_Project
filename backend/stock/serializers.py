@@ -27,6 +27,7 @@ class WarehouseSerializer(serializers.ModelSerializer):
     class Meta:
         model = Warehouse
         fields = ["warehouse_id", "wname", "wphone", "waddress"]
+        read_only_fields = ["warehouse_id"]
 
 
 class WarehouseLocationSerializer(serializers.ModelSerializer):
@@ -35,8 +36,9 @@ class WarehouseLocationSerializer(serializers.ModelSerializer):
     class Meta:
         model = WarehouseLocation
         fields = ["location_id", "warehouse", "warehouse_name", "aisle", "zone", "bin"]
+        read_only_fields = ["location_id", "warehouse_name"]
 
-
+        
 class RestockDetailSerializer(serializers.ModelSerializer):
     product_name = serializers.CharField(source="product.product_name", read_only=True)
 
