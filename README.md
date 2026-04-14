@@ -5,6 +5,7 @@ http://127.0.0.1:8000/admin/
 python -m http.server 3000
 http://127.0.0.1:3000/frontend/preview.html
 
+ไม่มีไรจะเทส git
 
 # README Setup Guide
 
